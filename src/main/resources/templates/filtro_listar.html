@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{header :: header ('Inserir Filtro')}"/>
+<head>
+    <meta http-equiv="refresh" content="30">
+    <script src="/datatable.js"></script>
+</head>
+
+<body>
+<div th:replace="~{menu :: menu}"></div>
+<div class="container">
+
+    <div class="row">
+        <div class="col">
+            <h2>Dados Filtro</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <!-- <form action="#" th:action="@{/filtroVO/}" th:object="${filtroVOS}"> -->
+
+            <table id="dataTable" class="display">
+                <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Data Criação</th>
+                    <th>Estado</th>
+                    <th>Diretório Entrada</th>
+                    <th>Diretório saida</th>
+                    <th>Inicio Execução</th>
+                    <th>Fim Execução</th>
+                    <th>Linhas Processadas</th>
+                    <th colspan="3">Ações</th>
+                </tr>
+                </thead>
+                <tbody class="table-striped">
+                <tr th:each="filtroVO:${filtroVOS}">
+                    <td th:text="${filtroVO.getId()}"></td>
+                    <td th:text="${#temporals.format(filtroVO.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${filtroVO.getEstado() + filtroVO.getNomeTarefas()}"></td>
+                    <td th:text="${filtroVO.getDiretorioEntrada()}"></td>
+                    <td th:text="${filtroVO.getDiretorioSaida()}"></td>
+                    <td th:text="${#temporals.format(filtroVO.getDtInicio(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#temporals.format(filtroVO.getDtFim(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#numbers.formatInteger(filtroVO.getNumeroLinhasProcessadas(),3,'POINT')}"></td>
+                    <td>
+                        <a th:href="@{/filtro/{id}(id=${filtroVO.id})}" class="btn btn-primary">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-pencil"/>
+                        </a>
+                    </td>
+                    <td>
+                        <a th:href="@{'/filtro/'+${filtroVO.id}+'/deletar'}" class="btn btn-danger">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
+                        </a>
+                    </td>
+                    <td>
+                        <a th:href="@{'/filtro/' + ${filtroVO.id} +'/executar'}" class="btn btn-dark">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-flash"/>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- </form> -->
+
+    <a th:href="@{/filtro/novo}">Adicionar Filtro</a>
+</div>
+</body>
+</html>

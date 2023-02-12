@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{header :: header ('Atualizar Configuracao')} ">
+</head>
+<body>
+<div th:replace="~{menu :: menu}"></div>
+<div class="container">
+    <h1>Configuracao Processamento dos CSVs</h1>
+
+    <form action="#" th:action="@{/configuracao}" th:object="${configuracoes}" method="POST">
+
+        <fieldset>
+            <table>
+                <tbody>
+                <tr th:each="configuracao, itemStat : ${configuracoes}">
+                    <td th:text="${configuracao.textoSite}" />
+                    <td><input type=text th:name="${configuracao.nome}"  th:value="${configuracao.valor}"/></td>
+                </tr>
+                </tbody>
+            </table>
+        </fieldset>
+        <fieldset>
+            <input type="submit" id="submitButton" th:value="Save">
+            <input type="reset" id="resetButton" name="reset" th:value="Reset"/>
+        </fieldset>
+    </form>
+
+    <hr>
+
+    <a th:href="@{/}">Volta para lista de Cozinhas</a>
+</div>
+</body>
+</html>

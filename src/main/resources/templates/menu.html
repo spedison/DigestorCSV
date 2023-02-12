@@ -1,0 +1,66 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="menu">
+  <a class="navbar-brand" href="#">Digestor CSV</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/">Inicial<span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/configuracao/">Configurações</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Ações
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">Mostrar Parte do Conteúdo</a>
+          <a class="dropdown-item" href="#">Mostrar Resumo dos Arquivos</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#" th:href="@{/filtro}">Filtrar dados do arquivo</a>
+          <a class="dropdown-item" href="#" th:href="@{/agrupa}">Agrupar Dados Por Colunas</a>
+          <a class="dropdown-item" href="#">Remover Colunas</a>
+          <a class="dropdown-item" href="#">Dados Estatísticos Básicos por Colunas</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Unir Arquivos em Um Só</a>
+          <a class="dropdown-item" href="#">Quebrar Arquivos Grandes em Menores</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Listar e Baixar os Arquivos</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Tarefas Em processamento
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">Listar</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Ajuda
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="/tutorial">Tutorial</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="/sobre">Sobre</a>
+        </div>
+      </li>
+
+      <!--
+      <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+      </li>
+      -->
+    </ul>
+    <!--
+    <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form> -->
+  </div>
+</nav>

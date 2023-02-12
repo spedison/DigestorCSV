@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{header :: header ('Agrupar Arquivos :: Lista')}"/>
+<head>
+    <meta http-equiv="refresh" content="30">
+    <script src="/datatable.js"></script>
+</head>
+
+<body>
+<div th:replace="~{menu :: menu}"></div>
+<div class="container">
+
+    <div class="row">
+        <div class="col">
+            <h2>Dados de Processamento de Agrupamentos</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <!-- <form action="#" th:action="@{/agrupaVO/}" th:object="${filtroVOS}"> -->
+
+            <table id="dataTable" class="display">
+                <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Data Criação</th>
+                    <th>Estado</th>
+                    <th>Diretório Entrada</th>
+                    <th>Diretório saida</th>
+                    <th>Inicio Execução</th>
+                    <th>Fim Execução</th>
+                    <th>Linhas Processadas</th>
+                    <th colspan="3">Ações</th>
+                </tr>
+                </thead>
+                <tbody class="table-striped">
+                <tr th:each="agrupaVO:${itens}">
+                    <td th:text="${agrupaVO.getId()}"></td>
+                    <td th:text="${#temporals.format(agrupaVO.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${agrupaVO.getEstado() + agrupaVO.getNomeTarefas()}"></td>
+                    <td th:text="${agrupaVO.getDiretorioEntrada()}"></td>
+                    <td th:text="${agrupaVO.getDiretorioSaida()}"></td>
+                    <td th:text="${#temporals.format(agrupaVO.getDtInicio(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#temporals.format(agrupaVO.getDtFim(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#numbers.formatInteger(agrupaVO.getNumeroLinhasProcessadas(),3,'POINT')}"></td>
+                    <td>
+                        <a th:href="@{'/agrupa/' + ${agrupaVO.id}}" class="btn btn-primary">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-pencil"/>
+                        </a>
+                    </td>
+                    <td>
+                        <a th:href="@{'/agrupa/' + ${agrupaVO.id} + '/deletar'}" class="btn btn-danger">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
+                        </a>
+                    </td>
+                    <td>
+                        <a th:href="@{'/agrupa/' + ${agrupaVO.id} +'/executar'}" class="btn btn-dark">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-flash"/>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- </form> -->
+
+    <a th:href="@{/agrupa/novo}">Adicionar Agrupamentos de Arquivos</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{header :: header ('Atualizar Cozinha')} ">
+</head>
+<body>
+<div th:replace="~{menu :: menu}"></div>
+<div class="container">
+    <h1>Employee Management System</h1>
+    <hr>
+    <h2>Update Employee</h2>
+
+    <form action="#" th:action="@{/save}" th:object="${cozinha}" method="POST">
+
+        <!-- Add hidden form field to handle update -->
+        <input type="hidden" th:field="*{id}"/>
+
+        <input type="text" th:field="*{nome}" class="form-control mb-4 col-4">
+
+        <input type="checkbox" th:field="*{habilitado}" class="form-control mb-4 col-4">
+
+        <button type="submit" class="btn btn-info col-2"> Update Employee</button>
+    </form>
+
+    <hr>
+
+    <a th:href="@{/}">Volta para lista de Cozinhas</a>
+</div>
+</body>
+</html>

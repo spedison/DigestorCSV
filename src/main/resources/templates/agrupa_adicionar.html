@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{header :: header ('Agrupar Arquivos :: Adicionar/Editar')}"/>
+<head>
+    <script src="/datatable.js"></script>
+</head>
+
+<body>
+<div th:replace="~{menu :: menu}"></div>
+
+<form action="#" th:action="@{/agrupa}" th:object="${agrupa}" method="POST">
+    <div class="container justify-content-center">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Adicionar/Alterar Agrupamento</h3>
+                <input type=hidden th:field="*{id}">
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <label class="form-label" for="diretorioEntrada">Selecione Diretório de entrada:</label>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col">
+                        <select class="form-control form-control-lg" th:field="*{diretorioEntrada}">
+                            <option th:each="dirEntrada : ${diretoriosEntrada}" th:value="${dirEntrada}"
+                                    th:text="${dirEntrada}"></option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="row mt-4">
+                    <div class="col">
+                        <label for="diretorioSaida">Diretório Saída:</label>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col">
+                        <input type=text readonly th:field="*{diretorioSaida}" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col col-6">
+                        <p th:text="*{'Data/Hora Criação : '+ #temporals.format(dataCriacao, 'dd/MM/yyyy HH:mm:ss')}"/>
+                    </div>
+                    <div class="col col-6">
+                        <p th:text="${'Estado Atual :' + agrupa.estado}"/>
+                    </div>
+                </div>
+
+                <div class="row mt-5 p-5">
+                    <div class="col-6" th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO') }">
+                        <button type="submit" class="btn btn-info w-100">Gravar</button>
+                    </div>
+                    <div class="col-6"
+                         th:if="${agrupa.camposParaAgrupar.size() > 0 && #strings.equals(agrupa.estado, 'NAO_INICIADO') }">
+                        <a th:href="@{'/agrupa/'+ ${agrupa.id} + '/executar'}" class="btn btn-info w-100" role="button"
+                           data-bs-toggle="button">Executar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<form th:action="@{'/agrupa/campo'}" th:object="${campo}" method="POST">
+    <div class="container justify-content-center mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO') }">
+
+                    <h3 class="card-title">Comparadores do Filtro</h3>
+
+                    <input type=hidden th:field="*{idAgrupa}">
+                    <input type=hidden th:field="*{idCampo}">
+
+                    <div class="row mt-5">
+                        <div class="col">
+                            <label class="form-check-label">Selecione o campo para agrupamento</label>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col">
+
+                            <select class="form-control form-control-lg" th:field="*{nomeCampo}">
+                                <option th:each="nomeCampoCombo, state : ${campos}"
+                                        th:value="${state.index}+';'+${nomeCampoCombo}"
+                                        th:text="${nomeCampoCombo}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-5">
+                    <div class="col">
+                        <button type="submit" class="btn btn-info w-100">Incluir</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <p class="h2">
+                    Lista de Campos
+                </p>
+            </div>
+
+            <div class="row mt-5 mr-1 ml-1">
+                <div class="col">
+                    <table id="dataTable" class="display">
+                        <thead>
+                        <tr>
+                            <td>#</td>
+                            <td>Nome</td>
+                            <td th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO')}">Ações</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="campoItem : ${agrupa.camposParaAgrupar}">
+                            <td th:text="${campoItem.id}"/>
+                            <td th:text="${campoItem.numeroColuna} + ' - ' + ${campoItem.nomeColuna}"/>
+                            <td th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO')}">
+                                <a th:href="@{'/agrupa/' + ${agrupa.id} + '/campo/' + ${campoItem.id} + '/deletar'}"
+                                   class="btn btn-danger">
+                                    <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</form>
+<hr>
+
+<a th:href="@{/agrupa}">Lista de Processamento de Agrupamento</a>
+</body>
+</html>

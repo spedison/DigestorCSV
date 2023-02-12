@@ -1,0 +1,63 @@
+package br.com.spedison.digestor_csv.controller;
+
+import br.com.spedison.digestor_csv.model.ConfiguracaoVO;
+import br.com.spedison.digestor_csv.service.ConfiguracaoService;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
+
+@Controller
+@Log4j2
+@RequestMapping("/configuracao")
+public class ConfiguracaoControler {
+
+    @Autowired
+    ConfiguracaoService configuracaoService;
+
+    @GetMapping("")
+    public String listCozinha(Model model) {
+        configuracaoService.iniciarConfiguracao();
+        model.addAttribute("configuracoes", configuracaoService.getListaParaTela());
+        return "configuracao";
+    }
+
+    @PostMapping("")
+    public String saveEmployee(HttpServletRequest request,
+                               UriComponentsBuilder uriComponentsBuilderdados) {
+
+        List<ConfiguracaoVO> dadosParaGravar = new LinkedList<>();
+        var dado = request.getParameterNames();
+        while (dado.hasMoreElements()) {
+            String chave = dado.nextElement();
+            log.debug("Chave = %s  | Valor = %s".formatted(chave, request.getParameter(chave)));
+            dadosParaGravar.add(new ConfiguracaoVO(chave, "", null,
+                    request.getParameter(chave), true));
+        }
+
+        configuracaoService.salvaListaDaTela(dadosParaGravar);
+
+        return "redirect:/configuracao";
+    }
+
+
+/*    @GetMapping("/showFormForUpdate/{id}")
+    public String updateForm(@PathVariable(value = "id") long id, Model model) {
+        Cozinha cozinha = cozinhaRepository.getReferenceById(id);
+        log.debug("Nome = " + cozinha.getNome() + "Habilitado = " + cozinha.isHabilitado());
+        model.addAttribute("cozinha", cozinha);
+        return "updatecozinha";
+    }
+
+    @GetMapping("/deleteEmployee/{id}")
+    public String deleteThroughId(@PathVariable(value = "id") long id) {
+        cozinhaRepository.deleteById(id);
+        return "redirect:/";
+
+    } */
+}
