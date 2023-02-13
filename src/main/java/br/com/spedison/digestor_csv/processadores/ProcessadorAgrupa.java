@@ -22,14 +22,14 @@ import java.util.stream.Stream;
 public class ProcessadorAgrupa extends ProcessadorBase {
 
     //Lista de Mapas contendo os Handles dos arquivos abertos.
-    private List<Map<String, BufferedWriter>> listaMapaArquivos = new LinkedList<>(); // Tem que ter um mapa desse para cada arquivo processado.
+    private final List<Map<String, BufferedWriter>> listaMapaArquivos = new LinkedList<>(); // Tem que ter um mapa desse para cada arquivo processado.
     @Autowired
     private AgrupaService agrupaService;
     private List<Integer> colunasParaProcessar;
     private AgrupaVO agrupaVO;
 
     private void adicionaMap() {
-        listaMapaArquivos.add(new TreeMap<String, BufferedWriter>());
+        listaMapaArquivos.add(new TreeMap<>());
     }
 
     @Override
@@ -83,16 +83,14 @@ public class ProcessadorAgrupa extends ProcessadorBase {
     }
 
 
-    void processaUmArquivo(FileProcessamento processamento) {
+    void processaUmArquivo(FileProcessamento arquivoEntrada) {
 
         try {
 
-            BufferedReader br = Utils.abreArquivoLeitura(processamento.toString(), getEncoding());
+            BufferedReader br = Utils.abreArquivoLeitura(arquivoEntrada.toString(), getEncoding());
 
-            String header;
-            // Imprime o Header
-            processamento.setHeader(br.readLine());
-            processamento.incLinhasProcessadas();
+            arquivoEntrada.setHeader(br.readLine());
+            arquivoEntrada.incLinhasProcessadas();
 
             String line;
 
@@ -107,21 +105,23 @@ public class ProcessadorAgrupa extends ProcessadorBase {
                                 .collect(Collectors.joining("___"));
 
                 // Pega o arquivo de acordo com a nome definido.
-                BufferedWriter bw = pegaAquivo(processamento, nomeSufixoArquivo);
+                BufferedWriter bw = pegaAquivo(arquivoEntrada, nomeSufixoArquivo);
 
                 if (bw != null) {
                     bw.write(line);
                     bw.newLine();
-                    processamento.incLinhasProcessadas();
+                    arquivoEntrada.incLinhasProcessadas();
                 } else {
                     log.error("Problemas ao gravar a linha : " + line);
                 }
 
-                if (processamento.getNumeroArquivoProcessamento() % 10_000 == 0)
+                if (arquivoEntrada.getNumeroArquivoProcessamento() % 100_000 == 0)
                     agrupaService.atualizaLinhasProcessadas(agrupaVO.getId(), getLinhasProcessadas());
             }
             br.close();
-            fechaTodosArquivos(processamento.getNumeroArquivoProcessamento());
+            fechaTodosArquivos(arquivoEntrada.getNumeroArquivoProcessamento());
+            agrupaService.atualizaLinhasProcessadas(getIdTarefa(), getLinhasProcessadas());
+            log.debug("Processado arquivo %s".formatted((arquivoEntrada.getName())));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {

@@ -97,6 +97,8 @@ public class ProcessadorFiltro extends ProcessadorBase {
             }
             aEscrita.close();
             aLeitura.close();
+            filtroService.atualizaLinhasProcessadas(getIdTarefa(), getLinhasProcessadas());
+            log.debug("Processado arquivo %s".formatted((arquivoEntrada.getName())));
         } catch (IOException e) {
             log.error(e);
             log.error("Problemas ao processar arquivos %s e %s.".formatted(arquivoSaida.toString(), arquivoEntrada.toString()));

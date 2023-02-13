@@ -91,7 +91,7 @@
                     </div>
 
                     <select class="form-control form-control-lg" th:field="*{tipoComparacao}">
-                        <option th:each="state : ${T(digestor_csv.model.TipoComparacaoEnum).values()}"
+                        <option th:each="state : ${T(br.com.spedison.digestor_csv.model.TipoComparacaoEnum).values()}"
                                 th:value="${state}"
                                 th:text="${state.texto}"></option>
                     </select>
