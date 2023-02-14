@@ -8,11 +8,11 @@
 <body>
 <div th:replace="~{menu :: menu}"></div>
 
-<form action="#" th:action="@{/agrupa}" th:object="${agrupa}" method="POST">
+<form action="#" th:action="@{/remove_colunas}" th:object="${removeColunas}" method="POST">
     <div class="container justify-content-center">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">Adicionar/Alterar - Agrupar arquivos por colunas</h3>
+                <h3 class="card-title">Adicionar/Alterar - Remove Colunas dos Arquivos</h3>
                 <hr class="hr"/>
                 <input type=hidden th:field="*{id}">
 
@@ -49,17 +49,18 @@
                         <p th:text="*{'Data/Hora Criação : '+ #temporals.format(dataCriacao, 'dd/MM/yyyy HH:mm:ss')}"/>
                     </div>
                     <div class="col col-6">
-                        <p th:text="${'Estado Atual :' + agrupa.estado}"/>
+                        <p th:text="${'Estado Atual :' + removeColunas.estado}"/>
                     </div>
                 </div>
 
                 <div class="row mt-5 p-5">
-                    <div class="col-6" th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO') }">
+                    <div class="col-6" th:if="${#strings.equals(removeColunas.estado, 'NAO_INICIADO') }">
                         <button type="submit" class="btn btn-info w-100">Gravar</button>
                     </div>
                     <div class="col-6"
-                         th:if="${agrupa.camposParaAgrupar.size() > 0 && #strings.equals(agrupa.estado, 'NAO_INICIADO') }">
-                        <a th:href="@{'/agrupa/'+ ${agrupa.id} + '/executar'}" class="btn btn-info w-100" role="button"
+                         th:if="${removeColunas.getCamposParaRemover.size() > 0 && #strings.equals(removeColunas.estado, 'NAO_INICIADO') }">
+                        <a th:href="@{'/remove_colunas/'+ ${removeColunas.id} + '/executar'}" class="btn btn-info w-100"
+                           role="button"
                            data-bs-toggle="button">Executar</a>
                     </div>
                 </div>
@@ -69,20 +70,20 @@
 </form>
 
 
-<form th:action="@{'/agrupa/campo'}" th:object="${campo}" method="POST">
+<form th:action="@{'/remove_colunas/campo'}" th:object="${campo}" method="POST">
     <div class="container justify-content-center mt-5">
         <div class="card">
             <div class="card-body">
-                <div th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO') }">
+                <div th:if="${#strings.equals(removeColunas.estado, 'NAO_INICIADO') }">
 
-                    <h3 class="card-title">Comparadores do Filtro</h3>
+                    <h3 class="card-title">Campo para remover</h3>
 
-                    <input type=hidden th:field="*{idAgrupa}">
+                    <input type=hidden th:field="*{idRemoveColunas}">
                     <input type=hidden th:field="*{idCampo}">
 
                     <div class="row mt-5">
                         <div class="col">
-                            <label class="form-check-label">Selecione o campo para agrupamento</label>
+                            <label class="form-check-label">Selecione o campo para remover</label>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -103,28 +104,27 @@
                     </div>
                 </div>
             </div>
-
             <hr class="hr"/>
-            <h3 class="h3 ml-3 mb-3">
+            <h3 class="ml-3">
                 Lista de Campos
             </h3>
 
-            <div class="row mt-5 mr-1 ml-1">
+            <div class="row mt-3 mr-1 ml-1">
                 <div class="col">
                     <table id="dataTable" class="display">
                         <thead>
                         <tr>
                             <td>#</td>
                             <td>Nome</td>
-                            <td th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO')}">Ações</td>
+                            <td th:if="${#strings.equals(removeColunas.estado, 'NAO_INICIADO')}">Ações</td>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="campoItem : ${agrupa.camposParaAgrupar}">
+                        <tr th:each="campoItem : ${removeColunas.camposParaRemover}">
                             <td th:text="${campoItem.id}"/>
                             <td th:text="${campoItem.numeroColuna} + ' - ' + ${campoItem.nomeColuna}"/>
-                            <td th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO')}">
-                                <a th:href="@{'/agrupa/' + ${agrupa.id} + '/campo/' + ${campoItem.id} + '/deletar'}"
+                            <td th:if="${#strings.equals(removeColunas.estado, 'NAO_INICIADO')}">
+                                <a th:href="@{'/remove_colunas/' + ${removeColunas.id} + '/campo/' + ${campoItem.id} + '/deletar'}"
                                    class="btn btn-danger">
                                     <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
                                 </a>
@@ -136,7 +136,7 @@
             </div>
         </div>
         <hr>
-        <a th:href="@{/agrupa}">Lista de Processamento de Agrupamento</a>
+        <a th:href="@{/remove_colunas}">Lista de Processamento de Agrupamento</a>
     </div>
 </form>
 </body>

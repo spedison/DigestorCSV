@@ -131,12 +131,4 @@ public class FiltroControler {
         return "redirect:/filtro/" + filtroVO.getId();
     }
 
-    /*
-
-    @GetMapping("/deleteEmployee/{id}")
-    public String deleteThroughId(@PathVariable(value = "id") long id) {
-        cozinhaRepository.deleteById(id);
-        return "redirect:/";
-
-    } */
 }

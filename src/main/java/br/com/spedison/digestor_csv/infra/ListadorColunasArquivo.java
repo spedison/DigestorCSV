@@ -2,9 +2,11 @@ package br.com.spedison.digestor_csv.infra;
 
 import br.com.spedison.digestor_csv.model.AgrupaVO;
 import br.com.spedison.digestor_csv.model.FiltroVO;
+import br.com.spedison.digestor_csv.model.RemoveColunasVO;
 import br.com.spedison.digestor_csv.service.AgrupaService;
 import br.com.spedison.digestor_csv.service.ConfiguracaoService;
 import br.com.spedison.digestor_csv.service.FiltroService;
+import br.com.spedison.digestor_csv.service.RemoveColunasService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,13 @@ public class ListadorColunasArquivo {
     @Autowired
     AgrupaService agrupaService;
 
+    @Autowired
+    RemoveColunasService removeColunasService;
+
+    public List<String> getListaColunasRemoveColunas(Long id) {
+        RemoveColunasVO agrupa = removeColunasService.getAgrupaSemCampos(id);
+        return getListColunas(agrupa.getDiretorioEntrada());
+    }
     public List<String> getListaColunasAgrupa(Long idAgrupa) {
         AgrupaVO agrupa = agrupaService.getAgrupaSemCampos(idAgrupa);
         return getListColunas(agrupa.getDiretorioEntrada());

@@ -12,7 +12,8 @@
     <div class="container justify-content-center">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">Adicionar/Alterar Filtro</h3>
+                <h3 class="card-title">Adicionar/Alterar - Filtro em arquivos</h3>
+                <hr class="hr"/>
                 <input type=hidden th:field="*{id}">
 
                 <div class="row mt-4">
@@ -81,7 +82,7 @@
             <div class="card-body">
                 <div th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }">
 
-                    <h3 class="card-title">Comparadores do Filtro</h3>
+                    <h3 class="card-title">Comparador do Filtro</h3>
 
                     <input type=hidden th:field="*{idComparador}">
                     <input type=hidden th:field="*{idFiltro}">
@@ -167,11 +168,10 @@
                     </div>
                 </div>
 
-                <div class="mt-5">
-                    <p class="h2">
-                        Lista de Comparadores aplicados ao filtroVO
-                    </p>
-                </div>
+                <hr class="hr"/>
+                <h3 class="h3 ml-3 mb-3">
+                    Lista de Comparadores
+                </h3>
 
                 <table id="dataTable" class="display mt-5">
                     <thead>
@@ -196,12 +196,11 @@
                     </tbody>
                 </table>
             </div>
+            <hr>
+            <a th:href="@{/filtro}">Lista de Filtros</a>
             <!-FIM CARD BODY-->
         </div>
     </div>
 </form>
-<hr>
-
-<a th:href="@{/filtro}">Lista de Filtros</a>
 </body>
 </html>

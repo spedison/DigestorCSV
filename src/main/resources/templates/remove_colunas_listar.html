@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{header :: header ('Agrupar Arquivos :: Lista')}"/>
+<head th:replace="~{header :: header ('Remover Colunas :: Lista')}"/>
 <head>
     <meta http-equiv="refresh" content="30">
     <script src="/datatable.js"></script>
@@ -12,14 +12,14 @@
 
     <div class="row">
         <div class="col">
-            <h3>Listagem - Agrupar arquivos por colunas</h3>
+            <h3>Listar - Remove Colunas dos Arquivos</h3>
             <hr class="hr" />
         </div>
     </div>
 
     <div class="row">
         <div class="col">
-            <!-- <form action="#" th:action="@{/agrupaVO/}" th:object="${filtroVOS}"> -->
+            <!-- <form action="#" th:action="@{/removeColunasVO/}" th:object="${filtroVOS}"> -->
 
             <table id="dataTable" class="display">
                 <thead class="thead-dark">
@@ -36,27 +36,27 @@
                 </tr>
                 </thead>
                 <tbody class="table-striped">
-                <tr th:each="agrupaVO:${itens}">
-                    <td th:text="${agrupaVO.getId()}"></td>
-                    <td th:text="${#temporals.format(agrupaVO.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"></td>
-                    <td th:text="${agrupaVO.getEstado() + agrupaVO.getNomeTarefas()}"></td>
-                    <td th:text="${agrupaVO.getDiretorioEntrada()}"></td>
-                    <td th:text="${agrupaVO.getDiretorioSaida()}"></td>
-                    <td th:text="${#temporals.format(agrupaVO.getDtInicio(), 'dd/MM/yyyy hh:mm:ss')}"></td>
-                    <td th:text="${#temporals.format(agrupaVO.getDtFim(), 'dd/MM/yyyy hh:mm:ss')}"></td>
-                    <td th:text="${#numbers.formatInteger(agrupaVO.getNumeroLinhasProcessadas(),3,'POINT')}"></td>
+                <tr th:each="removeColunasVO:${itens}">
+                    <td th:text="${removeColunasVO.getId()}"></td>
+                    <td th:text="${#temporals.format(removeColunasVO.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${removeColunasVO.getEstado() + removeColunasVO.getNomeTarefas()}"></td>
+                    <td th:text="${removeColunasVO.getDiretorioEntrada()}"></td>
+                    <td th:text="${removeColunasVO.getDiretorioSaida()}"></td>
+                    <td th:text="${#temporals.format(removeColunasVO.getDtInicio(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#temporals.format(removeColunasVO.getDtFim(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#numbers.formatInteger(removeColunasVO.getNumeroLinhasProcessadas(),3,'POINT')}"></td>
                     <td>
-                        <a th:href="@{'/agrupa/' + ${agrupaVO.id}}" class="btn btn-primary">
+                        <a th:href="@{'/remove_colunas/' + ${removeColunasVO.id}}" class="btn btn-primary">
                             <span class="glyphicon glyphicon glyphicon glyphicon-pencil"/>
                         </a>
                     </td>
                     <td>
-                        <a th:href="@{'/agrupa/' + ${agrupaVO.id} + '/deletar'}" class="btn btn-danger">
+                        <a th:href="@{'/remove_colunas/' + ${removeColunasVO.id} + '/deletar'}" class="btn btn-danger">
                             <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
                         </a>
                     </td>
                     <td>
-                        <a th:href="@{'/agrupa/' + ${agrupaVO.id} +'/executar'}" class="btn btn-dark">
+                        <a th:href="@{'/remove_colunas/' + ${removeColunasVO.id} +'/executar'}" class="btn btn-dark">
                             <span class="glyphicon glyphicon glyphicon glyphicon-flash"/>
                         </a>
                     </td>
@@ -67,7 +67,7 @@
     </div>
     <!-- </form> -->
 
-    <a th:href="@{/agrupa/novo}">Adicionar Agrupamentos de Arquivos</a>
+    <a th:href="@{/remove_colunas/novo}">Adicionar Remoção de Colunas de Arquivos</a>
 </div>
 </body>
 </html>
