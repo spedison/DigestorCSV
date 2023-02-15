@@ -53,19 +53,15 @@ public class ConfiguracaoService {
     public void salvaListaDaTela(List<ConfiguracaoVO> itensParaSalvar) {
         itensParaSalvar
                 .stream()
-                .map(c -> new String[]{c.getNome(), c.getValor()})
-                .forEach(str -> crepo.updateValor(str[0], str[1]));
+                .forEach(item -> crepo.updateValor(item.getNome(), item.getValor()));
     }
 
     public Properties getConfiguracao() {
         Properties ret = new Properties();
-
         crepo
                 .findAllByHabilitadoOrderByOrdem(true)
                 .stream()
-                .map(s -> new String[]{s.getNome(), s.getValor()})
-                .forEach(c -> ret.setProperty(c[0], c[1]));
-
+                .forEach(item -> ret.setProperty(item.getNome(), item.getValor()));
         return ret;
     }
 

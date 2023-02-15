@@ -1,10 +1,10 @@
 package br.com.spedison.digestor_csv.processadores;
 
+import br.com.spedison.digestor_csv.infra.ExecutadorComControleTempo;
 import br.com.spedison.digestor_csv.infra.FileProcessamento;
 import br.com.spedison.digestor_csv.infra.FileUtils;
-import br.com.spedison.digestor_csv.infra.Utils;
-import br.com.spedison.digestor_csv.model.FiltroComparadorVO;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
+import br.com.spedison.digestor_csv.model.FiltroComparadorVO;
 import br.com.spedison.digestor_csv.model.FiltroVO;
 import br.com.spedison.digestor_csv.service.FiltroService;
 import lombok.extern.log4j.Log4j2;
@@ -29,6 +29,9 @@ public class ProcessadorFiltro extends ProcessadorBase {
     private FiltroService filtroService;
 
     private FiltroVO filtroVO;
+
+    @Autowired
+    ExecutadorComControleTempo executaAtualizacao;
 
 
     private Boolean todasCondicoesDevemAtender = false;
@@ -90,11 +93,11 @@ public class ProcessadorFiltro extends ProcessadorBase {
 
                 linha = aLeitura.readLine();
                 arquivoEntrada.incLinhasProcessadas();
-                if (arquivoEntrada.getNumeroLinhasProcessadas() % 10_000 == 0) {
+                executaAtualizacao.executaSeTimeout(() -> {
                     long linhasProcessadas = getLinhasProcessadas();
                     filtroService.atualizaLinhasProcessadas(getIdTarefa(), linhasProcessadas);
                     log.debug("Processando %d linhas".formatted(linhasProcessadas));
-                }
+                });
             }
             aEscrita.close();
             aLeitura.close();

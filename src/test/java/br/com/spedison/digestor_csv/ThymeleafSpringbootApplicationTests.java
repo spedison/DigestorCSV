@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class ThymeleafSpringbootApplicationTests {
 
-    @Autowired
+    //@Autowired
 
 
     @Test

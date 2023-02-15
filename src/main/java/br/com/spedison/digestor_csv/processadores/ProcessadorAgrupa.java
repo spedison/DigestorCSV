@@ -1,9 +1,6 @@
 package br.com.spedison.digestor_csv.processadores;
 
-import br.com.spedison.digestor_csv.infra.FileProcessamento;
-import br.com.spedison.digestor_csv.infra.FileUtils;
-import br.com.spedison.digestor_csv.infra.StringUtils;
-import br.com.spedison.digestor_csv.infra.Utils;
+import br.com.spedison.digestor_csv.infra.*;
 import br.com.spedison.digestor_csv.model.AgrupaCampoVO;
 import br.com.spedison.digestor_csv.model.AgrupaVO;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
@@ -29,6 +26,9 @@ public class ProcessadorAgrupa extends ProcessadorBase {
     private AgrupaService agrupaService;
     private List<Integer> colunasParaProcessar;
     private AgrupaVO agrupaVO;
+
+    @Autowired
+    ExecutadorComControleTempo executaAtualizacao;
 
     private void adicionaMap() {
         listaMapaArquivos.add(new TreeMap<>());
@@ -64,6 +64,7 @@ public class ProcessadorAgrupa extends ProcessadorBase {
             return null;
         }
     }
+
     void processaUmArquivo(FileProcessamento arquivoEntrada) {
 
         try {
@@ -96,8 +97,10 @@ public class ProcessadorAgrupa extends ProcessadorBase {
                     log.error("Problemas ao gravar a linha : " + line);
                 }
 
-                if (arquivoEntrada.getNumeroArquivoProcessamento() % 100_000 == 0)
-                    agrupaService.atualizaLinhasProcessadas(agrupaVO.getId(), getLinhasProcessadas());
+                executaAtualizacao
+                        .executaSeTimeout(() -> {
+                            agrupaService.atualizaLinhasProcessadas(agrupaVO.getId(), getLinhasProcessadas());
+                        });
             }
             br.close();
             fechaTodosArquivos(arquivoEntrada.getNumeroArquivoProcessamento());

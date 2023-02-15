@@ -1,12 +1,12 @@
 package br.com.spedison.digestor_csv.processadores;
 
+import br.com.spedison.digestor_csv.infra.ExecutadorComControleTempo;
 import br.com.spedison.digestor_csv.infra.FileProcessamento;
 import br.com.spedison.digestor_csv.infra.FileUtils;
-import br.com.spedison.digestor_csv.infra.Utils;
-import br.com.spedison.digestor_csv.model.AgrupaCampoVO;
-import br.com.spedison.digestor_csv.model.AgrupaVO;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
-import br.com.spedison.digestor_csv.service.AgrupaService;
+import br.com.spedison.digestor_csv.model.RemoveColunasCampoVO;
+import br.com.spedison.digestor_csv.model.RemoveColunasVO;
+import br.com.spedison.digestor_csv.service.RemoveColunasService;
 import lombok.extern.log4j.Log4j2;
 import org.jobrunr.jobs.context.JobContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -26,64 +25,18 @@ import java.util.stream.Stream;
 public class ProcessadorRemoveColunas extends ProcessadorBase {
 
     //Lista de Mapas contendo os Handles dos arquivos abertos.
-    private final List<Map<String, BufferedWriter>> listaMapaArquivos = new LinkedList<>(); // Tem que ter um mapa desse para cada arquivo processado.
     @Autowired
-    private AgrupaService agrupaService;
-    private List<Integer> colunasParaProcessar;
-    private AgrupaVO agrupaVO;
+    private RemoveColunasService removeColunasService;
+    private RemoveColunasVO removeColunasVO;
 
-    private void adicionaMap() {
-        listaMapaArquivos.add(new TreeMap<>());
-    }
+    private List<Integer> colunasParaRemover;
+
+    @Autowired
+    ExecutadorComControleTempo executaAtualizacao;
 
     @Override
     protected void preInicia(Long idTarefa, JobContext jobContext) {
-        agrupaVO = agrupaService.getAgrupaComCampos(idTarefa);
-    }
-
-    BufferedWriter pegaAquivo(FileProcessamento fileProcessamento, String prefixo) {
-
-        Map<String, BufferedWriter> mapaArquivos = listaMapaArquivos.get(fileProcessamento.getNumeroArquivoProcessamento());
-
-        String[] arquivoSeparado = FileUtils.separaNomeExtensaoArquivo(fileProcessamento.getName());
-        String nomeArquivo = "%s___%s.%s".formatted(arquivoSeparado[0], prefixo, arquivoSeparado[1]);
-
-        // Se o Arquivo já está aberto, retorna.
-        if (mapaArquivos.containsKey(nomeArquivo)) {
-            return mapaArquivos.get(nomeArquivo);
-        }
-
-        try {
-            // Vamos abrir um arquivo novo.
-            BufferedWriter bw = FileUtils.abreArquivoEscrita(getDiretorioSaida(), nomeArquivo, getCharset());
-            // Adiciona o Header e ...
-            bw.write(fileProcessamento.getHeader());
-            bw.newLine();
-            // .. adiciona no map para utilizar posteriormente.
-            mapaArquivos.put(nomeArquivo, bw);
-            return bw;
-        } catch (IOException ioe) {
-            return null;
-        }
-    }
-
-    /***
-     * Ajusta o texto para que ele possa ser utilizado como nome de arquivo.
-     * @param nome - Nome utilizado para formar um arquivo.
-     * @return - Nome ajustado.
-     */
-    private String ajustaNome(String nome) {
-        return nome
-                .replaceAll("[ ]", "_")
-                .replaceAll("[/]", "-")
-                .replaceAll("[\\\\]", "-")
-                .replaceAll("[|]", "_")
-                .replaceAll("[!]", "_")
-                .replaceAll("[@]", "_")
-                .replaceAll("[*]", "_")
-                .replaceAll("[\"']", "")
-                .replaceAll("[?]", "_")
-                .trim();
+        removeColunasVO = removeColunasService.getRemoveColunasComCampos(idTarefa);
     }
 
 
@@ -93,38 +46,31 @@ public class ProcessadorRemoveColunas extends ProcessadorBase {
 
             BufferedReader br = FileUtils.abreArquivoLeitura(arquivoEntrada.toString(), getEncoding());
 
-            arquivoEntrada.setHeader(br.readLine());
-            arquivoEntrada.incLinhasProcessadas();
+            // Pega o arquivo de acordo com a nome definido.
+            BufferedWriter bw = null;
+            bw = FileUtils.abreArquivoEscrita(
+                    removeColunasVO.getDiretorioSaida(),
+                    arquivoEntrada.getName(), getEncoding());
 
-            String line;
-
+            String line = null;
             while ((line = br.readLine()) != null) {
-
+                arquivoEntrada.incLinhasProcessadas();
                 String[] colunas = line.split(super.getSeparadoresColunas());
-                final String nomeSufixoArquivo =
-                        colunasParaProcessar
-                                .stream()
-                                .map(i -> colunas[i])
-                                .map(this::ajustaNome)
-                                .collect(Collectors.joining("___"));
-
-                // Pega o arquivo de acordo com a nome definido.
-                BufferedWriter bw = pegaAquivo(arquivoEntrada, nomeSufixoArquivo);
-
-                if (bw != null) {
-                    bw.write(line);
-                    bw.newLine();
-                    arquivoEntrada.incLinhasProcessadas();
-                } else {
-                    log.error("Problemas ao gravar a linha : " + line);
-                }
-
-                if (arquivoEntrada.getNumeroArquivoProcessamento() % 100_000 == 0)
-                    agrupaService.atualizaLinhasProcessadas(agrupaVO.getId(), getLinhasProcessadas());
+                StringJoiner linhaProcessada = new StringJoiner(getSeparadoresColunas());
+                final int[] posColuna = {0};
+                IntStream.range(0, colunas.length)
+                        .filter(i -> !colunasParaRemover.contains(i))
+                        .mapToObj(i -> colunas[i])
+                        .forEach(linhaProcessada::add);
+                bw.write(linhaProcessada.toString());
+                bw.newLine();
+                executaAtualizacao.executaSeTimeout(() -> {
+                    removeColunasService.atualizaLinhasProcessadas(removeColunasVO.getId(), getLinhasProcessadas());
+                });
             }
             br.close();
-            fechaTodosArquivos(arquivoEntrada.getNumeroArquivoProcessamento());
-            agrupaService.atualizaLinhasProcessadas(getIdTarefa(), getLinhasProcessadas());
+            bw.close();
+            removeColunasService.atualizaLinhasProcessadas(getIdTarefa(), getLinhasProcessadas());
             log.debug("Processado arquivo %s".formatted((arquivoEntrada.getName())));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -133,55 +79,25 @@ public class ProcessadorRemoveColunas extends ProcessadorBase {
         }
     }
 
-    /***
-     * Fecha todos os arquivos que estão na variável mapaArquivos
-     */
-    private void fechaTodosArquivos(Integer posicao) {
-        Map<String, BufferedWriter> mapaArquivos = listaMapaArquivos.get(posicao);
-        mapaArquivos.forEach((str, bw) -> {
-            log.debug("Fechando arquivo " + str);
-            try {
-                bw.close();
-            } catch (IOException ioe) {
-                log.error("Problemas ao fechar arquivo " + str);
-            }
-        });
-    }
-
     @Override
     void terminar() {
-        log.debug("Fechando Arquivos.");
-        IntStream
-                .range(
-                        0,
-                        listaMapaArquivos.size())
-                .forEach(
-                        this::fechaTodosArquivos);
-
-        agrupaService.registrarFimProcessamento(agrupaVO.getId(), getLinhasProcessadas());
+        removeColunasService.registrarFimProcessamento(removeColunasVO.getId(), getLinhasProcessadas());
     }
 
     @Override
     boolean iniciar() {
 
-        if (agrupaVO.getEstado() != EstadoProcessamentoEnum.NAO_INICIADO)
+        if (removeColunasVO.getEstado() != EstadoProcessamentoEnum.NAO_INICIADO)
             return false;
 
-        // Pega o número das colunas que seráo usadas.
-        colunasParaProcessar = agrupaVO
-                .getCamposParaAgrupar()
-                .stream().map(AgrupaCampoVO::getNumeroColuna)
-                .toList();
+        colunasParaRemover =
+                removeColunasVO
+                        .getCamposParaRemover()
+                        .stream()
+                        .map(RemoveColunasCampoVO::getNumeroColuna)
+                        .toList();
 
-        // Numera todos os arquivos que serão processados.
-        IntStream
-                .range(0, getArquivosEmProcessamento().length)
-                .peek(i -> this.adicionaMap())// Adiciona item no map.
-                .forEach(
-                        i -> getArquivosEmProcessamento()[i]
-                                .setNumeroArquivoProcessamento(i)); // Defini o map na estrutura para processar.
-
-        agrupaService.registrarInicioProcessamento(getIdTarefa(), getJobId().toString());
+        removeColunasService.registrarInicioProcessamento(getIdTarefa(), getJobId().toString());
 
         return true;
     }
@@ -189,9 +105,9 @@ public class ProcessadorRemoveColunas extends ProcessadorBase {
     @Override
     void processar() {
 
-        Stream<FileProcessamento> stream = Arrays.stream(getArquivosEmProcessamento());
+        Stream<FileProcessamento> stream = Arrays.stream(super.getArquivosEmProcessamento());
 
-        agrupaService.registrarProcessando(getIdTarefa());
+        removeColunasService.registrarProcessando(getIdTarefa());
 
         (isParalelo() ?
                 stream.parallel() :
@@ -201,16 +117,16 @@ public class ProcessadorRemoveColunas extends ProcessadorBase {
 
     @Override
     String getDiretorioSaida() {
-        return agrupaVO.getDiretorioSaida();
+        return removeColunasVO.getDiretorioSaida();
     }
 
     @Override
     EstadoProcessamentoEnum getEstadoProcessamento() {
-        return agrupaVO.getEstado();
+        return removeColunasVO.getEstado();
     }
 
     @Override
     String getDiretorioEntrada() {
-        return agrupaVO.getDiretorioEntrada();
+        return removeColunasVO.getDiretorioEntrada();
     }
 }

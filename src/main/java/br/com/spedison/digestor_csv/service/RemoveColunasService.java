@@ -97,7 +97,7 @@ public class RemoveColunasService {
         return removeColunasRepository.save(f);
     }
 
-    public RemoveColunasVO getAgrupaComCampos(long id) {
+    public RemoveColunasVO getRemoveColunasComCampos(long id) {
         return removeColunasRepository.buscaPorIdComCampos(id);
     }
 
