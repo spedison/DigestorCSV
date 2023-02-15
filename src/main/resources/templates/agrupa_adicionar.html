@@ -12,7 +12,7 @@
     <div class="container justify-content-center">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">Adicionar/Alterar - Agrupar arquivos por colunas</h3>
+                <h3 class="card-title">Adicionar/Alterar - Agrupar dados de arquivos por colunas</h3>
                 <hr class="hr"/>
                 <input type=hidden th:field="*{id}">
 
@@ -75,7 +75,7 @@
             <div class="card-body">
                 <div th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO') }">
 
-                    <h3 class="card-title">Comparadores do Filtro</h3>
+                    <h3 class="card-title">Campos Agrupar Dados</h3>
 
                     <input type=hidden th:field="*{idAgrupa}">
                     <input type=hidden th:field="*{idCampo}">

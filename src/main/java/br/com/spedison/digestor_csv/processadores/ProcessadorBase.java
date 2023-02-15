@@ -2,6 +2,7 @@ package br.com.spedison.digestor_csv.processadores;
 
 
 import br.com.spedison.digestor_csv.infra.FileProcessamento;
+import br.com.spedison.digestor_csv.infra.StringUtils;
 import br.com.spedison.digestor_csv.infra.Utils;
 import br.com.spedison.digestor_csv.model.ConfiguracaoVO;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
@@ -103,7 +104,7 @@ public abstract class ProcessadorBase {
 
     public Charset getCharset() {
         String nomeCharset = properties.getProperty(ConfiguracaoVO.nomes[3]);
-        return Utils.getCharset(nomeCharset);
+        return StringUtils.getCharset(nomeCharset);
     }
 
     public String getSeparadoresColunas() {

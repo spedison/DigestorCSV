@@ -48,6 +48,7 @@ public class AgrupaService {
                 .toList();
     }
 
+    @Transactional
     public boolean removeAgrupa(Long agrupaId) {
         Integer contaC = agrupaRepository.deleteTodosComparadorDoFiltro(agrupaId);
         Integer contaF = agrupaRepository.deleteAgrupoById(agrupaId);

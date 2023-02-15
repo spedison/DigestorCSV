@@ -1,6 +1,7 @@
 package br.com.spedison.digestor_csv.processadores;
 
 import br.com.spedison.digestor_csv.infra.FileProcessamento;
+import br.com.spedison.digestor_csv.infra.FileUtils;
 import br.com.spedison.digestor_csv.infra.Utils;
 import br.com.spedison.digestor_csv.model.FiltroComparadorVO;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
@@ -52,8 +53,8 @@ public class ProcessadorFiltro extends ProcessadorBase {
 
         try {
             // Abre os arquivos de entrada e saída
-            BufferedReader aLeitura = Utils.abreArquivoLeitura(arquivoEntrada.toString(), getCharset());
-            BufferedWriter aEscrita = Utils.abreArquivoEscrita(arquivoSaida.toString(), getCharset());
+            BufferedReader aLeitura = FileUtils.abreArquivoLeitura(arquivoEntrada.toString(), getCharset());
+            BufferedWriter aEscrita = FileUtils.abreArquivoEscrita(arquivoSaida.toString(), getCharset());
 
             // Lê o header do Arquivo
             arquivoEntrada.setHeader(aLeitura.readLine()); // Lê o cabeçalho

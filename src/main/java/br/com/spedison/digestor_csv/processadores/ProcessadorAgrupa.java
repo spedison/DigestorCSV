@@ -1,6 +1,8 @@
 package br.com.spedison.digestor_csv.processadores;
 
 import br.com.spedison.digestor_csv.infra.FileProcessamento;
+import br.com.spedison.digestor_csv.infra.FileUtils;
+import br.com.spedison.digestor_csv.infra.StringUtils;
 import br.com.spedison.digestor_csv.infra.Utils;
 import br.com.spedison.digestor_csv.model.AgrupaCampoVO;
 import br.com.spedison.digestor_csv.model.AgrupaVO;
@@ -41,7 +43,7 @@ public class ProcessadorAgrupa extends ProcessadorBase {
 
         Map<String, BufferedWriter> mapaArquivos = listaMapaArquivos.get(fileProcessamento.getNumeroArquivoProcessamento());
 
-        String[] arquivoSeparado = Utils.separaNomeExtensaoArquivo(fileProcessamento.getName());
+        String[] arquivoSeparado = FileUtils.separaNomeExtensaoArquivo(fileProcessamento.getName());
         String nomeArquivo = "%s___%s.%s".formatted(arquivoSeparado[0], prefixo, arquivoSeparado[1]);
 
         // Se o Arquivo já está aberto, retorna.
@@ -51,7 +53,7 @@ public class ProcessadorAgrupa extends ProcessadorBase {
 
         try {
             // Vamos abrir um arquivo novo.
-            BufferedWriter bw = Utils.abreArquivoEscrita(getDiretorioSaida(), nomeArquivo, getCharset());
+            BufferedWriter bw = FileUtils.abreArquivoEscrita(getDiretorioSaida(), nomeArquivo, getCharset());
             // Adiciona o Header e ...
             bw.write(fileProcessamento.getHeader());
             bw.newLine();
@@ -62,32 +64,11 @@ public class ProcessadorAgrupa extends ProcessadorBase {
             return null;
         }
     }
-
-    /***
-     * Ajusta o texto para que ele possa ser utilizado como nome de arquivo.
-     * @param nome - Nome utilizado para formar um arquivo.
-     * @return - Nome ajustado.
-     */
-    private String ajustaNome(String nome) {
-        return nome
-                .replaceAll("[ ]", "_")
-                .replaceAll("[/]", "-")
-                .replaceAll("[\\\\]", "-")
-                .replaceAll("[|]", "_")
-                .replaceAll("[!]", "_")
-                .replaceAll("[@]", "_")
-                .replaceAll("[*]", "_")
-                .replaceAll("[\"']", "")
-                .replaceAll("[?]", "_")
-                .trim();
-    }
-
-
     void processaUmArquivo(FileProcessamento arquivoEntrada) {
 
         try {
 
-            BufferedReader br = Utils.abreArquivoLeitura(arquivoEntrada.toString(), getEncoding());
+            BufferedReader br = FileUtils.abreArquivoLeitura(arquivoEntrada.toString(), getEncoding());
 
             arquivoEntrada.setHeader(br.readLine());
             arquivoEntrada.incLinhasProcessadas();
@@ -101,7 +82,7 @@ public class ProcessadorAgrupa extends ProcessadorBase {
                         colunasParaProcessar
                                 .stream()
                                 .map(i -> colunas[i])
-                                .map(this::ajustaNome)
+                                .map(FileUtils::ajustaNome)
                                 .collect(Collectors.joining("___"));
 
                 // Pega o arquivo de acordo com a nome definido.

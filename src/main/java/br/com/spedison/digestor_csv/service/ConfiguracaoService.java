@@ -1,5 +1,6 @@
 package br.com.spedison.digestor_csv.service;
 
+import br.com.spedison.digestor_csv.infra.StringUtils;
 import br.com.spedison.digestor_csv.infra.Utils;
 import br.com.spedison.digestor_csv.model.ConfiguracaoVO;
 import br.com.spedison.digestor_csv.repository.ConfiguracaoRepository;
@@ -89,7 +90,7 @@ public class ConfiguracaoService {
     }
 
     public Charset getEnconding() {
-        String enc = crepo.getValores(ConfiguracaoVO.nomes[5]).get(0);
-        return Utils.getCharset(enc);
+        String enc = crepo.getValores(ConfiguracaoVO.nomes[3]).get(0);
+        return StringUtils.getCharset(enc);
     }
 }

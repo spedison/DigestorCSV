@@ -82,7 +82,7 @@
             <div class="card-body">
                 <div th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }">
 
-                    <h3 class="card-title">Comparador do Filtro</h3>
+                    <h3 class="card-title">Critério do Filtro</h3>
 
                     <input type=hidden th:field="*{idComparador}">
                     <input type=hidden th:field="*{idFiltro}">
@@ -170,7 +170,7 @@
 
                 <hr class="hr"/>
                 <h3 class="h3 ml-3 mb-3">
-                    Lista de Comparadores
+                    Lista de Critérios
                 </h3>
 
                 <table id="dataTable" class="display mt-5">
@@ -198,7 +198,7 @@
             </div>
             <hr>
             <a th:href="@{/filtro}">Lista de Filtros</a>
-            <!-FIM CARD BODY-->
+            <!-- FIM CARD BODY -->
         </div>
     </div>
 </form>

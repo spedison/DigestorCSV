@@ -80,7 +80,7 @@ public class ListadorColunasArquivo {
             return "";
 
         try {
-            BufferedReader br = Utils.abreArquivoLeitura(lista[0].toString(), encode);
+            BufferedReader br = FileUtils.abreArquivoLeitura(lista[0].toString(), encode);
             String ret = br.readLine();
             br.close();
             return ret;
