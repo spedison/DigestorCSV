@@ -35,10 +35,10 @@ public interface RemoveColunasRepository extends JpaRepository<RemoveColunasVO, 
     Integer updateJob(Long id, String jobId, EstadoProcessamentoEnum estadoProcessamento);
 
     @Modifying
-    @Query("update from RemoveColunasVO a set  a.numeroLinhasProcessadas= :linhasProcessadas where a.id = :id")
+    @Query("update from RemoveColunasVO a set  a.numeroLinhasProcessadas = :linhasProcessadas where a.id = :id")
     Integer atualizaLinhasProcessadas(Long id, Long linhasProcessadas);
 
     @Modifying
-    @Query("update from RemoveColunasVO a set  a.diretorioEntrada= :nomeDiretorio where a.id = :id")
+    @Query("update from RemoveColunasVO a set  a.diretorioEntrada = :nomeDiretorio where a.id = :id")
     Integer atualizaDiretoriosEntrada(Long id, String nomeDiretorio);
 }

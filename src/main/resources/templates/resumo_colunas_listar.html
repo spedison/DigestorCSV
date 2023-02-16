@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{header :: header ('Resumir dados por colunas :: Lista')}"/>
+<head>
+    <meta http-equiv="refresh" content="30">
+    <script src="/datatable.js"></script>
+</head>
+
+<body>
+<div th:replace="~{menu :: menu}"></div>
+<div class="container">
+
+    <div class="row">
+        <div class="col">
+            <h3>Listar - Remove Colunas dos Arquivos</h3>
+            <hr class="hr" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <!-- <form action="#" th:action="@{/removeColunasVO/}" th:object="${filtroVOS}"> -->
+
+            <table id="dataTable" class="display">
+                <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Data Criação</th>
+                    <th>Estado</th>
+                    <th>Diretório Entrada</th>
+                    <th>Diretório saida</th>
+                    <th>Inicio Execução</th>
+                    <th>Fim Execução</th>
+                    <th>Linhas Processadas</th>
+                    <th colspan="3">Ações</th>
+                </tr>
+                </thead>
+                <tbody class="table-striped">
+                <tr th:each="removeColunasVO:${itens}">
+                    <td th:text="${removeColunasVO.getId()}"></td>
+                    <td th:text="${#temporals.format(removeColunasVO.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${removeColunasVO.getEstado() + removeColunasVO.getNomeTarefas()}"></td>
+                    <td th:text="${removeColunasVO.getDiretorioEntrada()}"></td>
+                    <td th:text="${removeColunasVO.getDiretorioSaida()}"></td>
+                    <td th:text="${#temporals.format(removeColunasVO.getDtInicio(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#temporals.format(removeColunasVO.getDtFim(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#numbers.formatInteger(removeColunasVO.getNumeroLinhasProcessadas(),3,'POINT')}"></td>
+                    <td>
+                        <a th:href="@{'/remove_colunas/' + ${removeColunasVO.id}}" class="btn btn-primary">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-pencil"/>
+                        </a>
+                    </td>
+                    <td>
+                        <a th:href="@{'/remove_colunas/' + ${removeColunasVO.id} + '/deletar'}" class="btn btn-danger">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
+                        </a>
+                    </td>
+                    <td>
+                        <a th:href="@{'/remove_colunas/' + ${removeColunasVO.id} +'/executar'}" class="btn btn-dark">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-flash"/>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- </form> -->
+
+    <a th:href="@{/remove_colunas/novo}">Adicionar Remoção de Colunas de Arquivos</a>
+</div>
+</body>
+</html>
