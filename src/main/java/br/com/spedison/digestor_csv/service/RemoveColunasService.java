@@ -107,7 +107,7 @@ public class RemoveColunasService {
 
     @Transactional
     public RemoveColunasCampoVO adicionaCampos(RemoveColunasCampoVO campo) {
-        if (campo.getResumoColunasVO() == null)
+        if (campo.getRemoveColunasVO() == null)
             return null;
         return removeColunasCamposRepository.save(campo);
     }

@@ -33,7 +33,7 @@ public class AgrupaController {
     ProcessadorJobAgrupaService job;
 
     @GetMapping("")
-    public String lista(Model model) {
+    public String listar(Model model) {
         model.addAttribute("itens", agrupaService.listar());
         return "agrupa_listar";
     }
