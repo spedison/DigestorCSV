@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
 public class ProcessadorAgrupa extends ProcessadorBase {
 
     //Lista de Mapas contendo os Handles dos arquivos abertos.
-    private final List<Map<String, BufferedWriter>> listaMapaArquivos = new LinkedList<>(); // Tem que ter um mapa desse para cada arquivo processado.
+    private final List<Map<String, FileWriterResiliente>> listaMapaArquivos = new LinkedList<>(); // Tem que ter um mapa desse para cada arquivo processado.
     @Autowired
     private AgrupaService agrupaService;
     private List<Integer> colunasParaProcessar;
@@ -39,9 +40,9 @@ public class ProcessadorAgrupa extends ProcessadorBase {
         agrupaVO = agrupaService.getAgrupaComCampos(idTarefa);
     }
 
-    BufferedWriter pegaAquivo(FileProcessamento fileProcessamento, String prefixo) {
+    FileWriterResiliente pegaAquivo(FileProcessamento fileProcessamento, String prefixo) {
 
-        Map<String, BufferedWriter> mapaArquivos = listaMapaArquivos.get(fileProcessamento.getNumeroArquivoProcessamento());
+        Map<String, FileWriterResiliente> mapaArquivos = listaMapaArquivos.get(fileProcessamento.getNumeroArquivoProcessamento());
 
         String[] arquivoSeparado = FileUtils.separaNomeExtensaoArquivo(fileProcessamento.getName());
         String nomeArquivo = "%s___%s.%s".formatted(arquivoSeparado[0], prefixo, arquivoSeparado[1]);
@@ -51,18 +52,17 @@ public class ProcessadorAgrupa extends ProcessadorBase {
             return mapaArquivos.get(nomeArquivo);
         }
 
-        try {
-            // Vamos abrir um arquivo novo.
-            BufferedWriter bw = FileUtils.abreArquivoEscrita(getDiretorioSaida(), nomeArquivo, getCharset());
-            // Adiciona o Header e ...
-            bw.write(fileProcessamento.getHeader());
-            bw.newLine();
-            // .. adiciona no map para utilizar posteriormente.
-            mapaArquivos.put(nomeArquivo, bw);
-            return bw;
-        } catch (IOException ioe) {
-            return null;
-        }
+        // Vamos abrir um arquivo novo.
+        FileWriterResiliente fwr = new FileWriterResiliente();
+        fwr.setNomeArquivo(Paths.get(getDiretorioSaida(), nomeArquivo).toString());
+        fwr.setEncoding(getCharset());
+        //BufferedWriter bw = FileUtils.abreArquivoEscrita(getDiretorioSaida(), nomeArquivo, getCharset());
+        // Adiciona o Header e ...
+        fwr.writeLine(fileProcessamento.getHeader());
+        //bw.newLine();
+        // .. adiciona no map para utilizar posteriormente.
+        mapaArquivos.put(nomeArquivo, fwr);
+        return fwr;
     }
 
     void processaUmArquivo(FileProcessamento arquivoEntrada) {
@@ -87,27 +87,22 @@ public class ProcessadorAgrupa extends ProcessadorBase {
                                 .collect(Collectors.joining("___"));
 
                 // Pega o arquivo de acordo com a nome definido.
-                BufferedWriter bw = pegaAquivo(arquivoEntrada, nomeSufixoArquivo);
+                FileWriterResiliente bw = pegaAquivo(arquivoEntrada, nomeSufixoArquivo);
 
                 if (bw != null) {
-                    bw.write(line);
-                    bw.newLine();
+                    bw.writeLine(line);
                     arquivoEntrada.incLinhasProcessadas();
                 } else {
                     log.error("Problemas ao gravar a linha : " + line);
                 }
 
                 executaAtualizacao
-                        .executaSeTimeout(() -> {
-                            agrupaService.atualizaLinhasProcessadas(agrupaVO.getId(), getLinhasProcessadas());
-                        });
+                        .executaSeTimeout(() -> agrupaService.atualizaLinhasProcessadas(agrupaVO.getId(), getLinhasProcessadas()));
             }
             br.close();
             fechaTodosArquivos(arquivoEntrada.getNumeroArquivoProcessamento());
             agrupaService.atualizaLinhasProcessadas(getIdTarefa(), getLinhasProcessadas());
             log.debug("Processado arquivo %s".formatted((arquivoEntrada.getName())));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -117,7 +112,7 @@ public class ProcessadorAgrupa extends ProcessadorBase {
      * Fecha todos os arquivos que estão na variável mapaArquivos
      */
     private void fechaTodosArquivos(Integer posicao) {
-        Map<String, BufferedWriter> mapaArquivos = listaMapaArquivos.get(posicao);
+        Map<String, FileWriterResiliente> mapaArquivos = listaMapaArquivos.get(posicao);
         mapaArquivos.forEach((str, bw) -> {
             log.debug("Fechando arquivo " + str);
             try {
