@@ -1,5 +1,6 @@
 package br.com.spedison.digestor_csv.service;
 
+import br.com.spedison.digestor_csv.infra.FileUtils;
 import br.com.spedison.digestor_csv.infra.FormatadorData;
 import br.com.spedison.digestor_csv.model.*;
 import br.com.spedison.digestor_csv.repository.AgrupaCampoRepository;
@@ -27,16 +28,27 @@ public class AgrupaService {
 
     public AgrupaVO criaNovoAgrupa(String diretorioEntrada) {
         AgrupaVO ret = new AgrupaVO();
-        String dirSaida = configuracaoService.getConfiguracao(ConfiguracaoVO.nomes[2]);
         List<AgrupaCampoVO> campos = new LinkedList<>();
         ret.setId(null);
         ret.setEstado(EstadoProcessamentoEnum.NAO_INICIADO);
         ret.setDataCriacao(LocalDateTime.now());
         ret.setDiretorioEntrada(diretorioEntrada);
-        ret.setDiretorioSaida(Paths.get(dirSaida, "agrupa", formatadorData.formataDataParaArquivos(ret.getDataCriacao())).toString());
+        ret.setNomeTarefa("Tarefa Nova");
         ret.setCamposParaAgrupar(campos);
         ret.setNumeroLinhasProcessadas(0L);
+        defineDiretorioSaida(ret);
         return agrupaRepository.save(ret);
+    }
+
+    private void defineDiretorioSaida(AgrupaVO ret) {
+        String dirSaida = configuracaoService.getConfiguracao(ConfiguracaoVO.nomes[2]);
+        String dirData = formatadorData.formataDataParaArquivos(ret.getDataCriacao());
+        String dirNomeTarefa = FileUtils.ajustaNome(ret.getNomeTarefa());
+        ret.setDiretorioSaida(Paths.get(
+                dirSaida, "agrupa",
+                dirData + "__" +
+                        dirNomeTarefa).toString()
+        );
     }
 
     public List<Integer> pegaCamposParaAgrupar(Long idAgrupa) {
@@ -44,6 +56,9 @@ public class AgrupaService {
                 .buscaPorIdComCampos(idAgrupa)
                 .getCamposParaAgrupar()
                 .stream()
+                .sorted((o1, o2) -> { // Ordena pelo campo Ordem.
+                    return o1.getOrdem().compareTo(o2.getOrdem());
+                })
                 .map(AgrupaCampoVO::getNumeroColuna)
                 .toList();
     }
@@ -60,8 +75,15 @@ public class AgrupaService {
     }
 
     @Transactional
-    public Integer salvaDiretorios(AgrupaVO agrupaVO) {
-        return agrupaRepository.atualizaDiretoriosEntrada(agrupaVO.getId(), agrupaVO.getDiretorioEntrada());
+    public Integer salvaDiretoriosETarefa(AgrupaVO agrupaVO) {
+        AgrupaVO agrupaBanco = agrupaRepository.buscaPorIdSemCampos(agrupaVO.getId());
+        agrupaVO.setDataCriacao(agrupaBanco.getDataCriacao());
+        defineDiretorioSaida(agrupaVO);
+        return agrupaRepository.atualizaDiretoriosETarefa(
+                agrupaVO.getId(),
+                agrupaVO.getDiretorioEntrada(),
+                agrupaVO.getDiretorioSaida(),
+                agrupaVO.getNomeTarefa());
     }
 
     @Transactional
@@ -105,8 +127,12 @@ public class AgrupaService {
 
     @Transactional
     public AgrupaCampoVO adicionaCampos(AgrupaCampoVO campo) {
+
         if (campo.getAgrupaVO() == null)
             return null;
+
+        Integer proximaOrdem = agrupaRepository.getProximaOrdem(campo.getAgrupaVO().getId());
+        campo.setOrdem(proximaOrdem == null ? 1 : proximaOrdem);
         return agrupaCamposRepository.save(campo);
     }
 

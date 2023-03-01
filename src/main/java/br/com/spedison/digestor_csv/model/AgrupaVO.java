@@ -37,11 +37,20 @@ public class AgrupaVO {
     private Long numeroLinhasProcessadas;
     @Column(nullable = true)
     private String jobId;
+    private String nomeTarefa;
 
-    public String getNomeTarefas(){
+    public String getNomeTarefas() {
         if (getJobId() == null || getJobId().isBlank())
             return "";
         return " Tarefa :: " + getJobId();
+    }
+
+    public List<AgrupaCampoVO> getCamposOrdenados() {
+        return this
+                .getCamposParaAgrupar()
+                .stream()
+                .sorted((o1, o2) -> o1.getOrdem().compareTo(o2.getOrdem()))
+                .toList();
     }
 
 }

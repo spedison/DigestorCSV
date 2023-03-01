@@ -48,7 +48,6 @@ public class AgrupaController {
         AgrupaCampoDTO novoFiltroComparadorDTO = new AgrupaCampoDTO(agrupa.getId(), null, "");
         model.addAttribute("campo", novoFiltroComparadorDTO);
         model.addAttribute("campos", campos);
-        model.addAttribute("diretoriosEntrada", diretoriosEntrada);
         return "agrupa_adicionar";
     }
 
@@ -61,7 +60,7 @@ public class AgrupaController {
 
     @PostMapping({"/",""})
     public String save(@ModelAttribute("agrupa") AgrupaVO agrupaVO) {
-        agrupaService.salvaDiretorios(agrupaVO);
+        agrupaService.salvaDiretoriosETarefa(agrupaVO);
         return "redirect:/agrupa/" + agrupaVO.getId();
     }
 

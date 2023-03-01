@@ -26,6 +26,7 @@
                 <tr>
                     <th>#</th>
                     <th>Data Criação</th>
+                    <th>Nome da Tarefa</th>
                     <th>Estado</th>
                     <th>Diretório Entrada</th>
                     <th>Diretório saida</th>
@@ -39,6 +40,7 @@
                 <tr th:each="agrupaVO:${itens}">
                     <td th:text="${agrupaVO.getId()}"></td>
                     <td th:text="${#temporals.format(agrupaVO.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${agrupaVO.getNomeTarefa()}"></td>
                     <td th:text="${agrupaVO.getEstado() + agrupaVO.getNomeTarefas()}"></td>
                     <td th:text="${agrupaVO.getDiretorioEntrada()}"></td>
                     <td th:text="${agrupaVO.getDiretorioSaida()}"></td>

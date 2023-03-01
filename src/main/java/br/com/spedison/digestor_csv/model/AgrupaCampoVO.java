@@ -27,4 +27,6 @@ public class AgrupaCampoVO {
     Integer numeroColuna; // Número da Coluna iniciando em 0, se -1 compara com todas.
     @Column(length = 255, nullable = true)
     String nomeColuna; // Número da Coluna iniciando em 0, se -1 compara com todas.
+    @Column(nullable = false)
+    Integer ordem;
 }

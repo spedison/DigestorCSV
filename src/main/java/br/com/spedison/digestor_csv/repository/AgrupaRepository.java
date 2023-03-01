@@ -10,17 +10,21 @@ import java.util.List;
 
 public interface AgrupaRepository extends JpaRepository<AgrupaVO, Long> {
 
-    @Query("SELECT f FROM AgrupaVO f join fetch f.camposParaAgrupar c")
-    List<AgrupaVO> listaTodosComCampos();
+    //@Query("SELECT f FROM AgrupaVO f join fetch f.camposParaAgrupar c")
+    //List<AgrupaVO> listaTodosComCampos();
 
-    @Query("SELECT a FROM AgrupaVO a ")
-    List<AgrupaVO> listaTodosSemCampos();
+    //@Query("SELECT a FROM AgrupaVO a ")
+    //List<AgrupaVO> listaTodosSemCampos();
 
     @Query("SELECT a FROM AgrupaVO a join fetch a.camposParaAgrupar where a.id = :id")
     AgrupaVO buscaPorIdComCampos(Long id);
 
     @Query("SELECT a FROM AgrupaVO a where a.id = :id")
     AgrupaVO buscaPorIdSemCampos(Long id);
+
+    @Query("select max(a.ordem)+1 from AgrupaCampoVO a where a.agrupaVO.id = :idAgrupa")
+    Integer getProximaOrdem(Long idAgrupa);
+
 
     @Query("delete from AgrupaVO a where a.id = :id")
     @Modifying
@@ -43,6 +47,9 @@ public interface AgrupaRepository extends JpaRepository<AgrupaVO, Long> {
     Integer atualizaLinhasProcessadas(Long idAgrupa, Long linhasProcessadas);
 
     @Modifying
-    @Query("update from AgrupaVO a set  a.diretorioEntrada= :nomeDiretorio where a.id = :idAgrupa")
-    Integer atualizaDiretoriosEntrada(Long idAgrupa, String nomeDiretorio);
+    @Query("update from AgrupaVO a set  a.diretorioEntrada= :nomeDiretorioEntrada, a.diretorioSaida= :nomeDiretorioSaida, a.nomeTarefa = :nomeTarefa where a.id = :idAgrupa")
+    Integer atualizaDiretoriosETarefa(Long idAgrupa, String nomeDiretorioEntrada, String nomeDiretorioSaida, String nomeTarefa);
+
+
+
 }

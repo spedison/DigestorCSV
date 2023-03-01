@@ -17,6 +17,18 @@
                 <input type=hidden th:field="*{id}">
 
                 <div class="row mt-4">
+                    <div class="col">
+                        <label for="nomeTarefa">Nome da tarefa:</label>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col">
+                        <input type=text th:field="*{nomeTarefa}" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mt-4">
                     <div class="col-12">
                         <label class="form-label" for="diretorioEntrada">Selecione Diretório de entrada:</label>
                     </div>
@@ -120,7 +132,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="campoItem : ${agrupa.camposParaAgrupar}">
+                        <tr th:each="campoItem : ${ agrupa.getCamposOrdenados() }">
                             <td th:text="${campoItem.id}"/>
                             <td th:text="${campoItem.numeroColuna} + ' - ' + ${campoItem.nomeColuna}"/>
                             <td th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO')}">
