@@ -1,7 +1,9 @@
 package br.com.spedison.digestor_csv.processadores;
 
-import br.com.spedison.digestor_csv.infra.*;
-import br.com.spedison.digestor_csv.model.AgrupaCampoVO;
+import br.com.spedison.digestor_csv.infra.ExecutadorComControleTempo;
+import br.com.spedison.digestor_csv.infra.FileProcessamento;
+import br.com.spedison.digestor_csv.infra.FileUtils;
+import br.com.spedison.digestor_csv.infra.FileWriterResiliente;
 import br.com.spedison.digestor_csv.model.AgrupaVO;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
 import br.com.spedison.digestor_csv.service.AgrupaService;
@@ -10,7 +12,8 @@ import org.jobrunr.jobs.context.JobContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -142,11 +145,9 @@ public class ProcessadorAgrupa extends ProcessadorBase {
         if (agrupaVO.getEstado() != EstadoProcessamentoEnum.NAO_INICIADO)
             return false;
 
-        // Pega o número das colunas que seráo usadas.
-        colunasParaProcessar = agrupaVO
-                .getCamposParaAgrupar()
-                .stream().map(AgrupaCampoVO::getNumeroColuna)
-                .toList();
+        // Pega o número das colunas que seráo usadas devidamente ordenadas.
+        colunasParaProcessar =
+                agrupaService.pegaCamposParaAgrupar(agrupaVO.getId());
 
         // Numera todos os arquivos que serão processados.
         IntStream
