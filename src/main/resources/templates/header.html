@@ -19,3 +19,11 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
   <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
 </head>
+
+<div th:fragment="titulo_pagina (titulo)" class="row" >
+  <div class="col mt-5">
+    <hr class="hr mt-4 " />
+    <h3 th:text="${titulo}"></h3>
+    <hr class="hr mt-2 mb-4" />
+  </div>
+</div>

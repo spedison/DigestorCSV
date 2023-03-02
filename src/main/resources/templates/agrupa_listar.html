@@ -10,12 +10,7 @@
 <div th:replace="~{menu :: menu}"></div>
 <div class="container">
 
-    <div class="row">
-        <div class="col">
-            <h3>Listagem - Agrupar dados de arquivos por colunas</h3>
-            <hr class="hr" />
-        </div>
-    </div>
+    <head th:replace="~{header :: titulo_pagina ('Listagem - Agrupar dados de arquivos por colunas')}"/>
 
     <div class="row">
         <div class="col">
@@ -70,6 +65,8 @@
     <!-- </form> -->
 
     <a th:href="@{/agrupa/novo}">Adicionar Agrupamentos de Arquivos</a>
+
 </div>
+<div th:replace="~{menu_botton :: menu}"></div>
 </body>
 </html>

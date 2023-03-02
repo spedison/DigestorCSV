@@ -32,6 +32,9 @@ public class ConfiguracaoVO {
 
     Boolean habilitado;
 
-    transient public final static String[] nomes = {"separadores", "diretorio_entrada",
-            "diretorio_saida", "encoding", "processa_paralelo","extensao_arquivo"};
+    @Column(name = "texto_tootip_site", length = 512)
+    private String textoTooltipSite;
+
+    public final static String[] nomes = {"separadores", "diretorio_entrada",
+            "diretorio_saida", "encoding", "processa_paralelo","extensao_arquivo","extensao_para_novas_colunas"};
 }

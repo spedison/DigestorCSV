@@ -28,7 +28,7 @@ public class ConfiguracaoControler {
     }
 
     @PostMapping("")
-    public String saveEmployee(HttpServletRequest request,
+    public String save(HttpServletRequest request,
                                UriComponentsBuilder uriComponentsBuilderdados) {
 
         List<ConfiguracaoVO> dadosParaGravar = new LinkedList<>();
@@ -37,7 +37,7 @@ public class ConfiguracaoControler {
             String chave = dado.nextElement();
             log.debug("Chave = %s  | Valor = %s".formatted(chave, request.getParameter(chave)));
             dadosParaGravar.add(new ConfiguracaoVO(chave, "", null,
-                    request.getParameter(chave), true));
+                    request.getParameter(chave), true,null));
         }
 
         configuracaoService.salvaListaDaTela(dadosParaGravar);

@@ -8,14 +8,10 @@
 
 <body>
 <div th:replace="~{menu :: menu}"></div>
+
 <div class="container">
 
-    <div class="row">
-        <div class="col">
-            <h3>Listagem - Filtro em arquivos</h3>
-            <hr class="hr" />
-        </div>
-    </div>
+    <head th:replace="~{header :: titulo_pagina ('Listagem - Filtro em Arquivos')}"/>
 
     <div class="row">
         <div class="col">
@@ -69,5 +65,6 @@
 
     <a th:href="@{/filtro/novo}">Adicionar Filtro</a>
 </div>
+<div th:replace="~{menu_botton :: menu}"></div>
 </body>
 </html>

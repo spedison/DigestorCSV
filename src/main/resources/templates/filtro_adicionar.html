@@ -1,18 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head th:replace="~{header :: header ('Filtrar Arquivos')}"/>
 <head>
     <script src="/datatable.js"></script>
 </head>
 
-<body>
+<body class="container">
 <div th:replace="~{menu :: menu}"></div>
 
 <form action="#" th:action="@{/filtro}" th:object="${filtro}" method="POST">
-    <div class="container justify-content-center">
+
+    <head th:replace="~{header :: titulo_pagina ('Adicionar/Alterar - Filtro em arquivos')}"/>
+
+    <div class="container">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">Adicionar/Alterar - Filtro em arquivos</h3>
+                <h3 class="card-title">Dados do Filtro</h3>
                 <hr class="hr"/>
                 <input type=hidden th:field="*{id}">
 
@@ -76,14 +79,14 @@
 </form>
 
 
-<form th:action="@{'/filtro/comparador'}" th:object="${comparador}" method="POST">
-    <div class="container justify-content-center mt-5">
-        <div class="card">
-            <div class="card-body">
-                <div th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }">
+<div class="container justify-content-center mb-5 mb-lg-5">
+    <div class="card mt-5 mb-5 mb-lg-5">
+        <div class="card-body">
+            <div th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }">
 
-                    <h3 class="card-title">Critério do Filtro</h3>
+                <h3 class="card-title">Critério do Filtro</h3>
 
+                <form th:action="@{'/filtro/comparador'}" th:object="${comparador}" method="POST">
                     <input type=hidden th:field="*{idComparador}">
                     <input type=hidden th:field="*{idFiltro}">
 
@@ -166,41 +169,43 @@
                             <button type="submit" class="btn btn-info w-100">Incluir</button>
                         </div>
                     </div>
-                </div>
-
-                <hr class="hr"/>
-                <h3 class="h3 ml-3 mb-3">
-                    Lista de Critérios
-                </h3>
-
-                <table id="dataTable" class="display mt-5">
-                    <thead>
-                    <tr>
-                        <td>#</td>
-                        <td>Nome</td>
-                        <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">Ações</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="comparador : ${comparadores}">
-                        <td th:text="${comparador.id}"/>
-                        <td th:text="${comparador.getComparacao()}"/>
-                        <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">
-
-                            <a th:href="@{'/filtro/' + ${filtro.id} + '/comparador/' + ${comparador.id} + '/deletar'}"
-                               class="btn btn-danger">
-                                <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
-                            </a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                </form>
             </div>
-            <hr>
-            <a th:href="@{/filtro}">Lista de Filtros</a>
-            <!-- FIM CARD BODY -->
+
+            <hr class="hr"/>
+            <h3 class="h3 ml-3 mb-3">
+                Lista de Critérios
+            </h3>
+
+            <table id="dataTable" class="display mt-5">
+                <thead>
+                <tr>
+                    <td>#</td>
+                    <td>Nome</td>
+                    <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">Ações</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="comparador : ${comparadores}">
+                    <td th:text="${comparador.id}"/>
+                    <td th:text="${comparador.getComparacao()}"/>
+                    <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">
+
+                        <a th:href="@{'/filtro/' + ${filtro.id} + '/comparador/' + ${comparador.id} + '/deletar'}"
+                           class="btn btn-danger">
+                            <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
+        <hr>
+        <a th:href="@{/filtro}">Lista de Filtros</a>
+        <!-- FIM CARD BODY -->
     </div>
+</div>
 </form>
 </body>
+<div th:replace="~{menu_botton :: menu}"></div>
 </html>

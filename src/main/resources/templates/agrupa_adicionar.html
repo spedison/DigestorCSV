@@ -8,11 +8,12 @@
 <body>
 <div th:replace="~{menu :: menu}"></div>
 
-<form action="#" th:action="@{/agrupa}" th:object="${agrupa}" method="POST">
+<form action="#" th:action="@{/agrupa}" th:object="${agrupa}" method="POST" class="container">
+    <head th:replace="~{header :: titulo_pagina ('Adicionar/Alterar - Agrupar dados de arquivos por colunas')}"/>
     <div class="container justify-content-center">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">Adicionar/Alterar - Agrupar dados de arquivos por colunas</h3>
+                <h3 class="card-title">Dados do Agrupamento</h3>
                 <hr class="hr"/>
                 <input type=hidden th:field="*{id}">
 
@@ -151,5 +152,6 @@
         <a th:href="@{/agrupa}">Lista de Processamento de Agrupamento</a>
     </div>
 </form>
+<div th:replace="~{menu_botton :: menu}"></div>
 </body>
 </html>
