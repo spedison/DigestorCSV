@@ -9,6 +9,7 @@ import br.com.spedison.digestor_csv.service.FiltroService;
 import br.com.spedison.digestor_csv.service.RemoveColunasService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -46,7 +47,7 @@ public class ListadorColunasArquivo {
         FiltroVO fitro = filtroService.getFiltroSemComparadores(idFiltro);
         return getListColunas(fitro.getDiretorioEntrada());
     }
-
+    @Cacheable("colunas-arquivos-dir")
     public List<String> getListColunas(String dirEntrada) {
         String separador = configuracaoService.getSeparador();
         String extensao = configuracaoService.getExtensao();

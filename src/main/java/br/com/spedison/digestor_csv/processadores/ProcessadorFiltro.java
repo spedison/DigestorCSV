@@ -4,7 +4,7 @@ import br.com.spedison.digestor_csv.infra.ExecutadorComControleTempo;
 import br.com.spedison.digestor_csv.infra.FileProcessamento;
 import br.com.spedison.digestor_csv.infra.FileUtils;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
-import br.com.spedison.digestor_csv.model.FiltroComparadorVO;
+import br.com.spedison.digestor_csv.model.FiltroCriterioVO;
 import br.com.spedison.digestor_csv.model.FiltroVO;
 import br.com.spedison.digestor_csv.service.FiltroService;
 import lombok.extern.log4j.Log4j2;
@@ -36,10 +36,10 @@ public class ProcessadorFiltro extends ProcessadorBase {
 
     private Boolean todasCondicoesDevemAtender = false;
 
-    private String[] getColunasParaComparar(String[] colunas, String linhaToda, List<FiltroComparadorVO> comparadores) {
+    private String[] getColunasParaComparar(String[] colunas, String linhaToda, List<FiltroCriterioVO> comparadores) {
         return comparadores
                 .stream()
-                .map(FiltroComparadorVO::getNumeroColuna)
+                .map(FiltroCriterioVO::getNumeroColuna)
                 .map(c -> c == -1 ? linhaToda : colunas[c])
                 .toArray(String[]::new);
     }

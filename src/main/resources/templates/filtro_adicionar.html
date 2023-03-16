@@ -1,33 +1,171 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
-<head th:replace="~{header :: header ('Filtrar Arquivos')}"/>
-<head>
-    <script src="/datatable.js"></script>
-</head>
 
-<body class="container">
-<div th:replace="~{menu :: menu}"></div>
+<head th:replace="~{header :: header ('Filtrar Arquivos', 'Cadastro de Filtros para processamentos de Arquivos')}"/>
 
-<form action="#" th:action="@{/filtro}" th:object="${filtro}" method="POST">
 
-    <head th:replace="~{header :: titulo_pagina ('Adicionar/Alterar - Filtro em arquivos')}"/>
+<body>
+
+<div th:replace="~{menu :: menu_top}"></div>
+
+<script>
+    function ativa(aba) {
+        var tabPanel1 = document.getElementById("cartao-dados");
+        var tabPanel2 = document.getElementById("cartao-add-condicao");
+        var tabPanel3 = document.getElementById("cartao-list-condicao");
+        if (tabPanel2 == null)
+            tabPanel2 = tabPanel3;
+
+        var tab1 = document.getElementById("tab-1");
+        var tab2 = document.getElementById("tab-2");
+        var tab3 = document.getElementById("tab-3");
+        if (tab2 == null)
+            tab2 = tab3;
+
+        var fundoTab1 = document.getElementById("fundo-tab-1");
+        var fundoTab2 = document.getElementById("fundo-tab-2");
+        var fundoTab3 = document.getElementById("fundo-tab-3");
+        if (fundoTab2 == null)
+            fundoTab2 = fundoTab3;
+
+        switch (aba) {
+            case 1:
+                tabPanel1.style.display = "block";
+                tabPanel2.style.display = "none";
+                tabPanel3.style.display = "none";
+
+                tab2.classList.remove("active");
+                tab3.classList.remove("active");
+                tab1.classList.add("active");
+
+                fundoTab2.classList.remove("red");
+                fundoTab2.classList.remove("lighten-5");
+                fundoTab3.classList.remove("red");
+                fundoTab3.classList.remove("lighten-5");
+                fundoTab1.classList.add("red");
+                fundoTab1.classList.add("lighten-5");
+
+                break;
+            case 2:
+                tabPanel2.style.display = "block";
+                tabPanel1.style.display = "none";
+                tabPanel3.style.display = "none";
+                tab1.classList.remove("active");
+                tab3.classList.remove("active");
+                tab2.classList.add("active");
+
+                fundoTab1.classList.remove("red");
+                fundoTab1.classList.remove("lighten-5");
+                fundoTab3.classList.remove("red");
+                fundoTab3.classList.remove("lighten-5");
+                fundoTab2.classList.add("red");
+                fundoTab2.classList.add("lighten-5");
+
+                break;
+            case 3:
+                tabPanel3.style.display = "block";
+                tabPanel1.style.display = "none";
+                tabPanel2.style.display = "none";
+                tab1.classList.remove("active");
+                tab2.classList.remove("active");
+                tab3.classList.add("active");
+
+                fundoTab2.classList.remove("red");
+                fundoTab2.classList.remove("lighten-5");
+                fundoTab1.classList.remove("red");
+                fundoTab1.classList.remove("lighten-5");
+
+                fundoTab3.classList.add("red");
+                fundoTab3.classList.add("lighten-5");
+                break;
+        }
+    }
+
+    function selecionaTipoComparacao() {
+
+        var txtCombo = document.getElementById("tipoComparacao").value;
+
+        var divTexto = document.getElementById("texto");
+        var divNumeroInicio = document.getElementById("numero_inicio");
+        var divNumeroFim = document.getElementById("numero_fim");
+
+        if (txtCombo == "VAZIO") {
+            divNumeroInicio.style.display = "none";
+            divNumeroFim.style.display = "none";
+            divTexto.style.display = "none";
+        } else if (txtCombo.slice(0, 3) == "TXT") {
+            divNumeroInicio.style.display = "none";
+            divNumeroFim.style.display = "none";
+            divTexto.style.display = "block";
+        } else if (txtCombo == "NUM_ENTRE") {
+            divNumeroInicio.style.display = "block";
+            divNumeroFim.style.display = "block";
+            divTexto.style.display = "none";
+        } else {
+            divNumeroInicio.style.display = "block";
+            divNumeroFim.style.display = "none";
+            divTexto.style.display = "none";
+        }
+    }
+
+</script>
+
+<head th:replace="~{header :: titulo_pagina ('Adicionar/Alterar - Filtro em arquivos')}"/>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs tabs-fixed-width">
+                <li id="fundo-tab-1" class="  tab col s3 red lighten-5">
+                    <a id="tab-1" class="active" onclick="ativa(1)">
+                        Dados Filtro
+                    </a>
+                </li>
+                <li id="fundo-tab-2" class="  tab col s3" th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }"><a
+                        id="tab-2" onclick="ativa(2)">Adicionar Critério</a></li>
+                <li id="fundo-tab-3" class="  tab col s3"><a id="tab-3" onclick="ativa(3)">Lista Critérios</a></li>
+                <li>
+                    <a class="btn btn-floating right waves-effect waves-light red" th:href="@{'/filtro'}">
+                        <i class="material-icons">list</i>
+                    </a>
+                    <!--<a class="btn btn-floating right waves-effect waves-light red" onclick="mensagem('bla bla teste...')">
+                        <i class="material-icons">test</i>
+                    </a>-->
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<form th:action="@{/filtro}" th:object="${filtro}" method="POST" class="bottom-5" id="cartao-dados">
+    <input type=hidden th:field="*{id}"/>
 
     <div class="container">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">Dados do Filtro</h3>
-                <hr class="hr"/>
-                <input type=hidden th:field="*{id}">
+        <div class="card" style="display: block">
 
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <label class="form-label" for="diretorioEntrada">Selecione Diretório de entrada:</label>
+            <div class="card-content">
+
+                <div class="row">
+                    <span class="col s12 card-title">Dados do Filtro</span>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        <label for="nomeTarefa">Nome da tarefa:</label>
+                    </div>
+                    <div class="col s12">
+                        <input type=text th:field="*{nomeDaTarefa}"/>
                     </div>
                 </div>
 
-                <div class="row mt-2">
-                    <div class="col">
-                        <select class="form-control form-control-lg" th:field="*{diretorioEntrada}">
+
+                <div class="row">
+                    <div class="col s12 ">
+                        <label for="diretorioEntrada">Selecione Diretório de entrada:</label>
+                    </div>
+                    <div class="col s12 ">
+                        <select th:field="*{diretorioEntrada}">
                             <option th:each="dirEntrada : ${diretoriosEntrada}" th:value="${dirEntrada}"
                                     th:text="${dirEntrada}"></option>
                         </select>
@@ -35,42 +173,46 @@
                 </div>
 
 
-                <div class="row mt-4">
-                    <div class="col">
+                <div class="row">
+                    <div class="col s12">
                         <label for="diretorioSaida">Diretório Saída:</label>
                     </div>
-                </div>
-
-                <div class="row mt-2">
-                    <div class="col">
-                        <input type=text readonly th:field="*{diretorioSaida}" class="form-control">
+                    <div class="col s12">
+                        <input disabled type=text class="validate" th:field="*{diretorioSaida}"/>
                     </div>
                 </div>
 
-                <div class="form-switch mt-4">
-                    <input class="form-check-input w-auto" type=checkbox th:field="*{todasCondicoesDevemAtender}">
-                    <label class="form-check-label w-25 ml-4" for="todasCondicoesDevemAtender">
-                        Todas condições devem ser atendidas
-                    </label>
+                <div class="row">
+                    <div class="col s1 right-align">
+                        <input type="checkbox"
+                               style="opacity: 30;pointer-events: all"
+                               th:field="*{todasCondicoesDevemAtender}"/>
+                    </div>
+                    <div class="col s11 left-align">
+                            <span>
+                                Todas condições devem ser atendidas
+                            </span>
+                    </div>
                 </div>
 
-                <div class="row mt-4">
-                    <div class="col col-6">
+                <div class="row">
+                    <div class="col s12 m6 xl6 l6">
                         <p th:text="*{'Data/Hora Criação : '+ #temporals.format(dataCriacao, 'dd/MM/yyyy HH:mm:ss')}"/>
                     </div>
-                    <div class="col col-6">
+                    <div class="col s12 m6 xl6 l6">
                         <p th:text="${'Estado Atual :' + filtro.estado}"/>
                     </div>
                 </div>
 
-                <div class="row mt-5 p-5">
-                    <div class="col-6" th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }">
-                        <button type="submit" class="btn btn-info w-100">Gravar</button>
+                <div class="row">
+                    <div class="col s6" th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }">
+                        <button type="submit" class="btn w-100">Gravar</button>
                     </div>
-                    <div class="col-6"
+                    <div class="col s6"
                          th:if="${comparadores.size() > 0 && #strings.equals(filtro.estado, 'NAO_INICIADO') }">
-                        <a th:href="@{'/filtro/'+ ${filtro.id} + '/executar'}" class="btn btn-info w-100" role="button"
-                           data-bs-toggle="button">Executar</a>
+                        <a class="btn" style="width: 100%" th:href="@{'/filtro/'+ ${filtro.id} + '/executar'}">
+                            Executar
+                        </a>
                     </div>
                 </div>
             </div>
@@ -79,133 +221,154 @@
 </form>
 
 
-<div class="container justify-content-center mb-5 mb-lg-5">
-    <div class="card mt-5 mb-5 mb-lg-5">
-        <div class="card-body">
-            <div th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }">
+<form th:action="@{'/filtro/comparador'}" th:object="${comparador}"
+      method="POST" class="bottom-5"
+      id="cartao-add-condicao" style="display: none">
 
-                <h3 class="card-title">Critério do Filtro</h3>
+    <div class="container ">
+        <div class="card ">
 
-                <form th:action="@{'/filtro/comparador'}" th:object="${comparador}" method="POST">
-                    <input type=hidden th:field="*{idComparador}">
-                    <input type=hidden th:field="*{idFiltro}">
+            <div class="card-content">
 
-                    <div class="row mt-4">
-                        <label class="form-check-label w-25 ml-4">Comparação que será feita</label>
+                <div class="row">
+                    <span class="col s12 card-title">Critério do Filtro</span>
+                </div>
+
+                <input type=hidden th:field="*{idComparador}">
+                <input type=hidden th:field="*{idFiltro}">
+
+                <div class="row">
+                    <div class="col s12">
+                        <label>Selecione Coluna para Comparação:</label>
                     </div>
-
-                    <select class="form-control form-control-lg" th:field="*{tipoComparacao}">
-                        <option th:each="state : ${T(br.com.spedison.digestor_csv.model.TipoComparacaoEnum).values()}"
-                                th:value="${state}"
-                                th:text="${state.texto}"></option>
-                    </select>
-
-                    <!-- Inicia as tabs -->
-                    <ul class="nav-tabs nav mt-5">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-toggle="tab" href="#texto">
-                                Comparando Como Textos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#numero">
-                                Comparando Como Números
-                            </a>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content">
-                        <div id="texto" class="tab-pane container active">
-                            <!-- Inicia comparação com texto -->
-                            <div class="row mt-5">
-                                <div class="col">
-                                    <label class="form-label">Texto para comparar:</label>
-                                </div>
-                                <div class="col mt-2">
-                                    <input type=text th:field="*{strValor}" class="form-control form-inline w-75">
-                                </div>
-                            </div>
-                            <!-- Fim comparação com texto -->
-                        </div>
-                        <div id="numero" class="tab-pane container">
-                            <!-- Análise com Número -->
-                            <div class="row mt-5">
-                                <div class="col">
-                                    <label>Número Inicio:</label>
-                                </div>
-                                <div class="col mt-2">
-                                    <input type=text th:field="*{mumValor1}" class="form-control mb-4 col-4">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <label>Número Fim:</label>
-                                </div>
-                                <div class="col mt-2">
-                                    <input type=text th:field="*{mumValor2}" class="form-control mb-4 col-4">
-                                </div>
-                            </div>
-                            <!-- Analise com Número - Fim -->
-                        </div>
+                    <div class="col s12">
+                        <select th:field="*{nomeColuna}" class="form-control">
+                            <option value="-1;TODA_LINHA">Toda Linha</option>
+                            <option th:each="coluna, status : ${colunasArquivo}"
+                                    th:text="${coluna}"
+                                    th:value="${status.index}+';'+${coluna}">
+                            </option>
+                        </select>
                     </div>
+                </div>
 
-                    <div class="row mt-5">
-                        <div class="col col-4">
-                            <label>Selecione Coluna para Comparação:</label>
-                        </div>
-                        <div class="col col-8">
-                            <select th:field="*{nomeColuna}" class="form-control">
-                                <option value="-1;TODA_LINHA">Toda Linha</option>
-                                <option th:each="coluna, status : ${colunasArquivo}"
-                                        th:text="${coluna}"
-                                        th:value="${status.index}+';'+${coluna}">
-                                </option>
-                            </select>
-                        </div>
+                <div class="row">
+                    <div class="col s12">
+                        <label>Comparação que será feita</label>
                     </div>
+                    <div class="col s12">
+                        <select class="" th:field="*{tipoComparacao}" onchange="selecionaTipoComparacao()">
+                            <option th:each="state : ${T(br.com.spedison.digestor_csv.model.TipoComparacaoEnum).values()}"
+                                    th:value="${state}"
+                                    th:text="${state.texto}"></option>
+                        </select>
+                    </div>
+                </div>
 
-                    <div class="row mt-5">
-                        <div class="col">
-                            <button type="submit" class="btn btn-info w-100">Incluir</button>
-                        </div>
+
+                <div id="texto" class="row" style="display: none">
+                    <!-- Inicia comparação com texto -->
+                    <div class="col s12">
+                        <label class="form-label">Texto para comparar:</label>
                     </div>
-                </form>
+                    <div class="col s12">
+                        <input type=text th:field="*{strValor}"/>
+                    </div>
+                </div>
+                <!-- Fim comparação com texto -->
+
+
+                <div id="numero_inicio" class="row" style="display: none">
+                    <!-- Análise com Número -->
+                    <div class="col s12">
+                        <label>Número Inicio:</label>
+                    </div>
+                    <div class="col s12">
+                        <input type=text th:field="*{mumValor1}"/>
+                    </div>
+                </div>
+
+                <div id="numero_fim" class="row" style="display: none">
+                    <div class="col s12">
+                        <label>Número Fim:</label>
+                    </div>
+                    <div class="col s12">
+                        <input type=text th:field="*{mumValor2}"/>
+                    </div>
+                </div>
+                <!-- Analise com Número - Fim  -->
+
+
+                <div class="row">
+                    <div class="col offset-s6 s6">
+                        <button type="submit" class="btn w-100">Incluir</button>
+                    </div>
+                </div>
+
             </div>
-
-            <hr class="hr"/>
-            <h3 class="h3 ml-3 mb-3">
-                Lista de Critérios
-            </h3>
-
-            <table id="dataTable" class="display mt-5">
-                <thead>
-                <tr>
-                    <td>#</td>
-                    <td>Nome</td>
-                    <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">Ações</td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="comparador : ${comparadores}">
-                    <td th:text="${comparador.id}"/>
-                    <td th:text="${comparador.getComparacao()}"/>
-                    <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">
-
-                        <a th:href="@{'/filtro/' + ${filtro.id} + '/comparador/' + ${comparador.id} + '/deletar'}"
-                           class="btn btn-danger">
-                            <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
-                        </a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
         </div>
-        <hr>
-        <a th:href="@{/filtro}">Lista de Filtros</a>
-        <!-- FIM CARD BODY -->
     </div>
-</div>
 </form>
+
+
+<form class="bottom-5"
+      id="cartao-list-condicao" style="display: none">
+
+    <div class="container ">
+        <div class="card ">
+
+            <div class="card-content">
+
+                <div class="row">
+                    <span class="col s12 card-title">Lista de Condição</span>
+                </div>
+
+
+                <div class="row">
+                    <div class="col s12">
+                        <table id="dataTable" class="display">
+                            <thead>
+                            <tr>
+                                <td>#</td>
+                                <td>Nome</td>
+                                <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">Ações</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="comparador : ${comparadores}">
+                                <td th:text="${comparador.id}"/>
+                                <td th:text="${comparador.getComparacao()}"/>
+                                <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">
+                                    <a th:replace="icons ::remover( @{'/filtro/' + ${filtro.id} + '/comparador/' + ${comparador.id} + '/deletar'} )"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+            <!-- FIM CARD BODY -->
+        </div>
+    </div>
+</form>
+
+<footer th:replace="~{menu :: menu_bottom}"/>
+
+<!-- Include external files -->
+<div th:replace="~{menu :: jss}"/>
+
+<!-- Run JS initialize scripts -->
+<script th:replace="~{icons :: tooltip_js}"/>
+<script th:replace="~{icons :: select_js}"/>
+<div th:replace="~{menu :: menu_js}"/>
 </body>
-<div th:replace="~{menu_botton :: menu}"></div>
+
+<script th:if="${!mensagem.isEmpty()}" th:inline="javascript">
+    $(document).ready(function () {
+        var msg = /*[[${mensagem}]]*/;
+        M.toast({html: msg});
+    });
+</script>
+
 </html>

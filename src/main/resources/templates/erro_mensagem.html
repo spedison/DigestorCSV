@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head th:replace="~{header :: header ('Mensagem','Tivemos erro na solicitação de algum dado. Retorne a tela principal e verifique se os dados ainda estão cadastrados.')}"/>
+
+<body>
+<div th:replace="~{menu :: menu_top}"/>
+
+<div class="container">
+
+    <head th:replace="~{header :: titulo_pagina_alerta ('Mensagem de Erro')}"/>
+
+    <div class="row">
+        <div class="col s12"><h4 th:text="${mensagem_linha1+'!'}"/></div>
+    </div>
+
+    <div class="row">
+        <div class="col s12"><h4 th:text="${mensagem_linha2} +'.'"/></div>
+    </div>
+    <div class="row">
+        <div class="col s12">
+            <a th:href="${link}" th:text="${nome_link}"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s8 offset-s2">
+            <img class="responsive-img" th:src="@{/images/robo-quebrado-sm-simples.jpg}"/>
+        </div>
+        <div class="col s2"/>
+    </div>
+</div>
+
+</div>
+
+</body>
+<div th:replace="~{menu :: menu_bottom}"></div>
+</html>

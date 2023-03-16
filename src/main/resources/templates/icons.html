@@ -1,0 +1,25 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<a th:fragment="editar( link )" th:href="${link}">
+    <i class="material-icons">edit_document</i>
+</a>
+
+<a th:fragment="executar( link )" th:href="${link}">
+    <i class="material-icons">play_circle_outline</i>
+</a>
+
+<a th:fragment="remover( link )" th:href="${link}">
+    <i class="material-icons">delete</i>
+</a>
+
+<script th:fragment="tooltip_js">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<script th:fragment="select_js">
+    $(document).ready(function() {
+        $('select').formSelect();
+    })
+</script>

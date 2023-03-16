@@ -1,4 +1,8 @@
-$(document).ready( function () {
+$(document).ready(function () {
+    $('#dataTable').DataTable();
+});
+
+/*$(document).ready( function () {
     var table = $('#dataTable').DataTable();/*{
         "sAjaxSource": "/employees",
         "sAjaxDataProp": "",
@@ -11,5 +15,5 @@ $(document).ready( function () {
             { "mData": "phone" },
             { "mData": "active" }
         ]
-    })*/
-});
+    })
+});*/

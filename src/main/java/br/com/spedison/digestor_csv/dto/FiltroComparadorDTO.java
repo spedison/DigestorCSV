@@ -1,6 +1,6 @@
 package br.com.spedison.digestor_csv.dto;
 
-import br.com.spedison.digestor_csv.model.FiltroComparadorVO;
+import br.com.spedison.digestor_csv.model.FiltroCriterioVO;
 import br.com.spedison.digestor_csv.model.TipoComparacaoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +25,7 @@ public class FiltroComparadorDTO {
     BigDecimal mumValor2;
     String nomeColuna; // Nome da coluna no Header do 1o Arquivo
 
-    public void preencheVO(FiltroComparadorVO compadorVO) {
+    public void preencheVO(FiltroCriterioVO compadorVO) {
         compadorVO.setId(getIdComparador());
         compadorVO.setTipoComparacao(getTipoComparacao());
         compadorVO.setStrValor(getStrValor());

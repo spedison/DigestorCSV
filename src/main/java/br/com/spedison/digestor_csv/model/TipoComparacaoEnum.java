@@ -4,6 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum TipoComparacaoEnum {
+
+    VAZIO("Selecione"),
     TXT_IGUAL("é texto e igual"),
     TXT_CONTEM("é texto e contém"),
     TXT_NAO_CONTEM("é texto e não contém"),

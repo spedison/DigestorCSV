@@ -1,14 +1,14 @@
 package br.com.spedison.digestor_csv.repository;
 
-import br.com.spedison.digestor_csv.model.FiltroComparadorVO;
+import br.com.spedison.digestor_csv.model.FiltroCriterioVO;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface FiltroComparadorRepository extends JpaRepository<FiltroComparadorVO,Long> {
+public interface FiltroComparadorRepository extends JpaRepository<FiltroCriterioVO,Long> {
 
 
-    List<FiltroComparadorVO> findAllByFiltroVO_Id(long id);
+    List<FiltroCriterioVO> findAllByFiltroVO_Id(long id);
 
     void removeByIdAndFiltroVO_Id(long id, long filtroId);
 }

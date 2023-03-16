@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.jobrunr.jobs.context.JobContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -77,6 +78,7 @@ public abstract class ProcessadorBase {
 
     abstract String getDiretorioEntrada();
 
+    @CacheEvict({"primeiro-entrada-entrada","diretorios-entrada",   })
     public void executar(Long idTarefa, JobContext jobContext) {
         preInicia(idTarefa,jobContext);
         this.idTarefa = idTarefa;

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{header :: header ('Atualizar Configuracao')} ">
-</head>
-<body class="expandable-content">
-<div th:replace="~{menu :: menu}"></div>
+
+<head th:replace="~{header :: header ('Atualizar Configuracao','Define parâmetros para processamento dos arquivos csvs')} "/>
+
+<body>
+<div th:replace="~{menu :: menu_top}"></div>
+
 <div class="container">
 
     <head th:replace="~{header :: titulo_pagina ('Configuração do Processamento dos CSVs')}"/>
@@ -11,9 +13,10 @@
     <form action="#" th:action="@{/configuracao}" th:object="${configuracoes}" method="POST">
 
         <div th:each="configuracao, itemStat : ${configuracoes}" class="form-group row">
-            <div class="col-sm-5">
-                <label th:text="${configuracao.textoSite+' :'}" class="col-form-label col-form-label-lg mb-3 mr-2"
-                       data-toggle="tooltip" data-placement="rigth" th:title="${configuracao.getTextoTooltipSite()}"/>
+            <div class="col s5">
+                <label th:text="${configuracao.textoSite+' :'}" class="col-form-label col-form-label-lg tooltipped"
+                       data-toggle="tooltip" data-position="rigth"
+                       th:data-tooltip="${configuracao.getTextoTooltipSite()}"/>
             </div>
             <div class="col-sm-7">
                 <input type=text th:name="${configuracao.nome}" th:value="${configuracao.valor}"
@@ -21,22 +24,32 @@
             </div>
         </div>
 
-        <div class="form-group row mt-5">
-            <div class="col-sm-6">
-                <input type="submit" id="submitButton" th:value="Save" class="btn btn-info w-100">
+        <div class="row">
+            <div class="col s6">
+                <input type="submit" id="submitButton" th:value="Save" class="btn w-100">
             </div>
-            <div class="col-sm-6">
-                <input type="reset" id="resetButton" name="reset" th:value="Reset" class="btn btn-info w-100"/>
+            <div class="col s6">
+                <input type="reset" id="resetButton" name="reset" th:value="Reset" class="btn w-100" />
             </div>
+            <div class="col s12">&nbsp;</div>
+            <div class="col s12">&nbsp;</div>
         </div>
     </form>
-    <hr>
 </div>
-<div th:replace="~{menu_botton :: menu}"></div>
-<script>
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
-</script>
+<!-- Footer -->
+<footer th:replace="~{menu :: menu_bottom}"/>
+
+<!-- Include external files -->
+<div th:replace="~{menu :: jss}"/>
+
+<!-- Run JS initialize scripts -->
+<script th:replace="~{icons :: tooltip_js}"/>
+<div th:replace="~{menu :: menu_js}"/>
 </body>
+<script th:if="${!mensagem.isEmpty()}" th:inline="javascript">
+    $(document).ready(function () {
+        var msg = /*[[${mensagem}]]*/;
+        M.toast({html: msg});
+    });
+</script>
 </html>

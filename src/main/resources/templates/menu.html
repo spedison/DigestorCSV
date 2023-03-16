@@ -1,60 +1,75 @@
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<nav class="navbar navbar-fixed-top  navbar-inverse  navbar-expand navbar-dark" th:fragment="menu">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Digestor CSV</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/configuracao/">Configurações</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Ações
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Mostrar Parte do Conteúdo (TODO)</a>
-                        <a class="dropdown-item" href="#">Mostrar Resumo dos Arquivos (TODO)</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#" th:href="@{/filtro}">Filtrar Arquivos</a>
-                        <a class="dropdown-item" href="#" th:href="@{/agrupa}">Agrupar Arquivos Por Colunas</a>
-                        <a class="dropdown-item" href="#" th:href="@{/remove_colunas}">Remover Colunas dos Arquivos</a>
-                        <a class="dropdown-item" href="#">Dados Estatísticos Básicos por Colunas(TODO)</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Unir Arquivos em Um Só(TODO)</a>
-                        <a class="dropdown-item" href="#">Quebrar Arquivos Grandes em Menores(TODO)</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Listar e Baixar os Arquivos(TODO)</a>
-                    </div>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Ajuda
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/tutorial">Tutorial</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/sobre">Sobre</a>
-                    </div>
-                </li>
+<div class="navbar-fixed" th:fragment="menu_top">
+    <ul id="dropdown_verificacao" class="dropdown-content">
+        <li class="red accent-1 "><a class="white-text" href="#" th:href="@{/filtro}">Checar Diretórios</a></li>
+        <li class="red accent-1 "><a class="white-text" href="#" th:href="@{/filtro}">Mostrar Cabeçalho dos arquivos</a>
+        </li>
+    </ul>
 
-                <!--
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+    <ul id="dropdown_processamento" class="dropdown-content">
+        <li class="red accent-1  "><a class="white-text" href="#" th:href="@{/filtro}">Filtrar Arquivos</a></li>
+        <li class="red accent-1 "><a class="white-text" href="#" th:href="@{/agrupa}">Agrupar Arquivos Por Colunas</a>
+        </li>
+        <li class="red accent-1 "><a class="white-text" href="#" th:href="@{/remove_colunas}">Remover Colunas dos
+            Arquivos</a></li>
+    </ul>
+
+    <nav>
+        <div class="nav-wrapper">
+            <a class="brand-logo" th:href="@{/}">Digestor CSV</a>
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a th:href="@{/}">Configuracao</a>
                 </li>
-                -->
+                <li>
+                    <a href="#!" class="dropdown-trigger" data-target="dropdown_verificacao">
+                        Verificacao
+                        <i class="material-icons right">arrow_drop_down</i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#!" class="dropdown-trigger" data-target="dropdown_processamento">
+                        Processamento
+                        <i class="material-icons right">arrow_drop_down</i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">Ajuda</a>
+                </li>
             </ul>
-            <!--
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form> -->
         </div>
-    </div>
-</nav>
+    </nav>
+</div>
+
+<script th:fragment="menu_js">
+    document.addEventListener('DOMContentLoaded', function () {
+        $('.dropdown-trigger').dropdown();
+        $('.sidenav').sidenav();
+    });
+</script>
+
+<div th:fragment="menu_bottom">
+    <footer class="page-footer">
+        <div class="row">
+            <div class="col s12 m4 xl4 l4 center-align">
+                <a class="white-text" target="_blank" href="https://github.com/spedison?tab=repositories">Github</a>
+            </div>
+            <div class="col s12 m4 xl4 l4 center-align">
+                <a class="white-text" target="_blank" href="https://www.facebook.com/edison.ribeiroaraujo">Facebook</a>
+            </div>
+            <div class="col s12 m4 xl4 l4 center-align">
+                <a class="white-text" target="_blank" href="https://www.gnu.org/licenses/licenses.html#GPL">
+                    Licença de Uso GNU (Mantenha a autoria)
+                </a>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<head th:fragment="jss">
+    <script th:src="@{/js/jquery-3.6.3.min.js}"></script>
+    <script th:src="@{/materialize/materialize.js}"></script>
+    <!--<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>-->
+</head>

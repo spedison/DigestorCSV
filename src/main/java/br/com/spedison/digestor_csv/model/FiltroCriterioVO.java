@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Log4j2
 @AllArgsConstructor
 @NoArgsConstructor
-public class FiltroComparadorVO {
+public class FiltroCriterioVO {
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -49,6 +49,7 @@ public class FiltroComparadorVO {
                 case NUM_MAIOR -> (new BigDecimal(strValor)).compareTo(mumValor1) > 0;
                 case NUM_MENOR -> (new BigDecimal(strValor)).compareTo(mumValor1) < 0;
                 case NUM_IGUAL -> (new BigDecimal(strValor)).compareTo(mumValor1) == 0;
+                case VAZIO -> false;
             };
         } catch (NumberFormatException nfe) {
             log.error(nfe);
@@ -73,6 +74,7 @@ public class FiltroComparadorVO {
                     getMumValor2();
             case NUM_IGUAL, NUM_MAIOR, NUM_MENOR -> "Coluna " + getNomeColuna() + " " +
                     tipoComparacao.getTexto() + " " + getMumValor1();
+            case VAZIO -> "Sem nenhuma comparação. Favor remover a dicionar outra";
         };
     }
 }

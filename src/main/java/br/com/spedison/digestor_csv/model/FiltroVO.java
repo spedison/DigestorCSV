@@ -22,6 +22,9 @@ public class FiltroVO {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(length = 255, nullable = false)
+    private String nomeDaTarefa;
+
     @Column(nullable = false)
     private String diretorioEntrada;
     @Column(nullable = false)
@@ -31,7 +34,7 @@ public class FiltroVO {
     @Enumerated(EnumType.STRING)
     private EstadoProcessamentoEnum estado;
     @OneToMany(mappedBy = "filtroVO", fetch = FetchType.LAZY)
-    private List<FiltroComparadorVO> comparadores;
+    private List<FiltroCriterioVO> comparadores;
     private LocalDateTime dtInicio;
     private LocalDateTime dtFim;
 
@@ -45,9 +48,11 @@ public class FiltroVO {
     private String jobId;
 
     public String getNomeTarefas(){
-        if (getJobId() == null || getJobId().isBlank())
-            return "";
-        return " Tarefa :: " + getJobId();
+        return "";
+        //return getEstado().toString();
+        //if (getJobId() == null || getJobId().isBlank())
+        //    return "";
+        //return " Tarefa :: " + getJobId();
     }
 
 }

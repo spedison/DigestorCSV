@@ -3,6 +3,7 @@ package br.com.spedison.digestor_csv.infra;
 import br.com.spedison.digestor_csv.service.ConfiguracaoService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -21,9 +22,10 @@ public class ListadorDiretoriosEArquivos {
     @Autowired
     ConfiguracaoService configuracaoService;
 
-    private void addInList(File dir, List<File> directories) throws IOException {
+    private void addInList(File dir, List<File> directories, Long limite) throws IOException {
         try (Stream<Path> stream = Files.walk(Paths.get(dir.toString()), 10)) {
             stream
+                    .limit(limite)
                     .filter(Files::isDirectory)
                     .map(Path::toFile)
                     .forEach(directories::add);
@@ -33,12 +35,13 @@ public class ListadorDiretoriosEArquivos {
         }
     }
 
+    @Cacheable("diretorios-entrada")
     public List<File> lerDiretoriosParaEntrada() {
         List<File> ret = new LinkedList<>();
         List<String> diretorios = configuracaoService.getDiretorios();
         IntStream.range(0, diretorios.size()).forEach(i -> {
             try {
-                addInList(new File(diretorios.get(i)), ret);
+                addInList(new File(diretorios.get(i)), ret, 1_000_000L);
             } catch (IOException ioe) {
             }
         });
@@ -54,4 +57,14 @@ public class ListadorDiretoriosEArquivos {
                         .toList();
     }
 
+    @Cacheable("primeiro-diretorio-entrada")
+    public File lerPrimeiroDiretorioParaEntrada() {
+        List<File> ret = new LinkedList<>();
+        String diretorios = configuracaoService.getDiretorios().get(0);
+            try {
+                addInList(new File(diretorios), ret, 1L);
+            } catch (IOException ioe) {
+            }
+        return ret.get(0);
+    }
 }

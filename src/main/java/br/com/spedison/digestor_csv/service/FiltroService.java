@@ -1,7 +1,11 @@
 package br.com.spedison.digestor_csv.service;
 
+import br.com.spedison.digestor_csv.infra.FileUtils;
 import br.com.spedison.digestor_csv.infra.FormatadorData;
-import br.com.spedison.digestor_csv.model.*;
+import br.com.spedison.digestor_csv.model.ConfiguracaoVO;
+import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
+import br.com.spedison.digestor_csv.model.FiltroCriterioVO;
+import br.com.spedison.digestor_csv.model.FiltroVO;
 import br.com.spedison.digestor_csv.repository.FiltroComparadorRepository;
 import br.com.spedison.digestor_csv.repository.FiltroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +38,17 @@ public class FiltroService {
         String dirSaida = configuracaoService.getConfiguracao(ConfiguracaoVO.nomes[2]);
 
         //ComparadorVO comp = new ComparadorVO(null, ret, TipoComparacaoEnum.TXT_CONTEM, "teste", null, null, -1, "TODALINHA");
-        List<FiltroComparadorVO> comparadores = new LinkedList<>();
+        List<FiltroCriterioVO> comparadores = new LinkedList<>();
         //comparadores.add(comp);
         ret.setId(null);
         ret.setEstado(EstadoProcessamentoEnum.NAO_INICIADO);
         ret.setDataCriacao(LocalDateTime.now());
         ret.setDiretorioEntrada(diretorioEntrada);
+        ret.setNomeDaTarefa("Nome da Tarefa");
         ret.setDiretorioSaida(
                 Paths.get(
                                 dirSaida, "filtro",
+                                FileUtils.ajustaNome(ret.getNomeTarefas()),
                                 formatadorData.formataDataParaArquivos(ret.getDataCriacao()))
                         .toString());
         ret.setComparadores(comparadores);
@@ -51,6 +57,7 @@ public class FiltroService {
         return filtroRepository.save(ret);
     }
 
+    @Transactional
     public boolean removeFiltro(Long filtroId) {
         Integer contaC = filtroRepository.deleteTodosComparadorDoFiltro(filtroId);
         Integer contaF = filtroRepository.deleteFiltroById(filtroId);
@@ -62,17 +69,25 @@ public class FiltroService {
     }
 
     @Transactional
-    public FiltroVO salvaDiretorios(FiltroVO filtroVO) {
+    public FiltroVO gravaDadosDoFiltro(FiltroVO filtroVO) {
         return atualizaDiretorios(filtroVO);
     }
 
     @Transactional
     public FiltroVO atualizaDiretorios(FiltroVO filtroVO) {
         Optional<FiltroVO> paraSalvar = filtroRepository.findById(filtroVO.getId());
+        String dirSaida = configuracaoService.getConfiguracao(ConfiguracaoVO.nomes[2]);
         if (paraSalvar.isPresent()) {
+            paraSalvar.get().setNomeDaTarefa(filtroVO.getNomeDaTarefa());
             paraSalvar.get().setDiretorioEntrada(filtroVO.getDiretorioEntrada());
             paraSalvar.get().setTodasCondicoesDevemAtender(filtroVO.getTodasCondicoesDevemAtender());
-            //paraSalvar.get().setDiretorioSaida(filtro.getDiretorioSaida());
+            paraSalvar.get().setDiretorioSaida(
+                    Paths.get(
+                                    dirSaida, "filtro",
+                                    FileUtils.ajustaNome(
+                                            paraSalvar.get().getNomeDaTarefa()),
+                                    formatadorData.formataDataParaArquivos(paraSalvar.get().getDataCriacao()))
+                            .toString());
             filtroRepository.save(paraSalvar.get());
             return paraSalvar.get();
         }
@@ -82,10 +97,10 @@ public class FiltroService {
     @Transactional
     public FiltroVO criaFiltroESalvaDiretorios(FiltroVO filtroVO) {
         FiltroVO f = new FiltroVO(
-                null, filtroVO.getDiretorioEntrada(),
+                null, "Filtro Tarefa 1", filtroVO.getDiretorioEntrada(),
                 filtroVO.getDiretorioSaida(), LocalDateTime.now(),
                 EstadoProcessamentoEnum.NAO_INICIADO,
-                new LinkedList<FiltroComparadorVO>(), null, null, -1L, true, null);
+                new LinkedList<FiltroCriterioVO>(), null, null, -1L, true, null);
         return filtroRepository.save(f);
     }
 
@@ -126,17 +141,21 @@ public class FiltroService {
     }
 
     public FiltroVO getFiltroSemComparadores(long id) {
-        return filtroRepository.getReferenceById(id);
+        Optional<FiltroVO> ret = filtroRepository.findById(id);
+        if (ret.isEmpty()) {
+            throw new RegistroNaoLocalizadoException("Filtro " + id + " Não localizado");
+        }
+        return ret.get();
     }
 
     @Transactional
-    public FiltroComparadorVO adicionaComparador(FiltroComparadorVO filtroComparadorVO) {
-        if (filtroComparadorVO.getFiltroVO() == null)
+    public FiltroCriterioVO adicionaCriterio(FiltroCriterioVO filtroCriterioVO) {
+        if (filtroCriterioVO.getFiltroVO() == null)
             return null;
-        return filtroComparadorRepository.save(filtroComparadorVO);
+        return filtroComparadorRepository.save(filtroCriterioVO);
     }
 
-    public List<FiltroComparadorVO> getComparadoresDoFiltro(long id) {
+    public List<FiltroCriterioVO> getCriteriosDoFiltro(long id) {
         return filtroComparadorRepository.findAllByFiltroVO_Id(id);
     }
 

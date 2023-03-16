@@ -3,21 +3,21 @@ package br.com.spedison.digestor_csv.controller;
 import br.com.spedison.digestor_csv.dto.FiltroComparadorDTO;
 import br.com.spedison.digestor_csv.infra.ListadorColunasArquivo;
 import br.com.spedison.digestor_csv.infra.ListadorDiretoriosEArquivos;
-import br.com.spedison.digestor_csv.model.FiltroComparadorVO;
+import br.com.spedison.digestor_csv.model.FiltroCriterioVO;
 import br.com.spedison.digestor_csv.model.FiltroVO;
 import br.com.spedison.digestor_csv.model.TipoComparacaoEnum;
 import br.com.spedison.digestor_csv.processadores.service.ProcessadorJobFiltroService;
 import br.com.spedison.digestor_csv.service.FiltroService;
+import br.com.spedison.digestor_csv.service.RegistroNaoLocalizadoException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,23 +44,19 @@ public class FiltroControler {
      * @return
      */
     @GetMapping("")
-    public String list(Model model) {
+    public String list(Model model, @RequestParam(required = false) String msg) {
         List<FiltroVO> filtroVOS = filtroService.listar();
         model.addAttribute("filtros", filtroVOS);
+        model.addAttribute("mensagem", msg == null ? "" : msg);
         return "filtro_listar";
     }
 
     @GetMapping("/novo")
     public String adicionar(Model model) {
-        List<String> diretoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaString();
-        FiltroVO novo = filtroService.criaNovoFiltro(diretoriosEntrada.get(0));
-        FiltroComparadorDTO novoFiltroComparadorDTO = new FiltroComparadorDTO(null, novo.getId(), TipoComparacaoEnum.TXT_INICIA,
-                "test", null, null, "-1;LINHA TODA");
-        model.addAttribute("filtro", novo);
-        model.addAttribute("comparador", novoFiltroComparadorDTO);
-        model.addAttribute("comparadores", novo.getComparadores());
-        model.addAttribute("diretoriosEntrada", diretoriosEntrada);
-        return "filtro_adicionar";
+        String diretoriosEntrada = listadorDiretoriosEArquivos.lerPrimeiroDiretorioParaEntrada().toString();
+        FiltroVO novo = filtroService.criaNovoFiltro(diretoriosEntrada);
+        return "redirect:/filtro/" + novo.getId() + "?msg="
+                + URLEncoder.encode("Novo filtro criado com o id " + novo.getId(), StandardCharsets.UTF_8);
     }
 
     /***
@@ -70,65 +66,86 @@ public class FiltroControler {
      * @return
      */
     @PostMapping("")
-    public String save(FiltroVO filtroVO) {
-        FiltroVO f = filtroService.salvaDiretorios(filtroVO);
-        return "redirect:/filtro/" + f.getId();
+    public String gravaFiltro(FiltroVO filtroVO) {
+        FiltroVO f = filtroService.gravaDadosDoFiltro(filtroVO);
+        return "redirect:/filtro/" + f.getId() + "?msg="
+                + URLEncoder.encode("Gravação realizada com sucesso", StandardCharsets.UTF_8);
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable(value = "id") long id, Model model) {
-        FiltroVO filtroVO = filtroService.getFiltroSemComparadores(id);
-        List<String> colunasArquivo = listadorColunasArquivos.getListaColunasFiltro(filtroVO.getId());
-        model.addAttribute("filtro", filtroVO);
-        List<FiltroComparadorVO> comparadores = filtroService.getComparadoresDoFiltro(id);
+    public String show(@PathVariable(value = "id") long id, @RequestParam(required = false) String msg, Model model) {
 
-        if (comparadores == null) {
-            comparadores = new LinkedList<>();
+        String mensagem = msg == null ? "" : msg;
+
+        try {
+            FiltroVO filtroVO = filtroService.getFiltroSemComparadores(id);
+
+            List<String> colunasArquivo = listadorColunasArquivos.getListaColunasFiltro(filtroVO.getId());
+            model.addAttribute("filtro", filtroVO);
+            List<FiltroCriterioVO> comparadores = filtroService.getCriteriosDoFiltro(id);
+
+            if (comparadores == null) {
+                comparadores = new LinkedList<>();
+            }
+
+            model.addAttribute("comparador", new FiltroComparadorDTO(filtroVO.getId(),
+                    null, TipoComparacaoEnum.VAZIO,
+                    "", BigDecimal.ZERO, BigDecimal.ZERO,
+                    "-1;LINHA_TODA"));
+
+            model.addAttribute("comparadores", comparadores);
+
+            List<String> direatoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaString();
+            model.addAttribute("diretoriosEntrada", direatoriosEntrada);
+            model.addAttribute("colunasArquivo", colunasArquivo);
+            model.addAttribute("mensagem", mensagem);
+            return "filtro_adicionar";
+
+        } catch (RegistroNaoLocalizadoException rnl) {
+            model.addAttribute("mensagem_linha1", rnl.getMessage());
+            model.addAttribute("mensagem_linha2", "O filtro que você deseja não existe. " +
+                    "Favor retorne para a página de listagem de filtros");
+            model.addAttribute("link", "/filtro");
+            model.addAttribute("nome_link", "Listagem de filtros");
+            return "erro_mensagem";
         }
-
-        model.addAttribute("comparador", new FiltroComparadorDTO(filtroVO.getId(),
-                null, TipoComparacaoEnum.TXT_IGUAL,
-                "", BigDecimal.ZERO, BigDecimal.ZERO,
-                 "-1;LINHA_TODA"));
-
-        model.addAttribute("comparadores", comparadores);
-
-        List<String> direatoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaString();
-        model.addAttribute("diretoriosEntrada", direatoriosEntrada);
-        model.addAttribute("colunasArquivo", colunasArquivo);
-
-        return "filtro_adicionar";
     }
 
-    @GetMapping("/{idFiltro}/comparador/{idComparador}/deletar")
+    @GetMapping("/{idFiltro}/comparador/{idCriterio}/deletar")
     public String show(@PathVariable long idFiltro,
-                       @PathVariable long idComparador,
+                       @PathVariable long idCriterio,
                        Model model) {
-        filtroService.removeComparador(idFiltro, idComparador);
-        return "redirect:/filtro/" + idFiltro;
+        filtroService.removeComparador(idFiltro, idCriterio);
+        return "redirect:/filtro/" + idFiltro + "?msg="
+                + URLEncoder.encode("Critério #" + idCriterio + " removido com sucesso", StandardCharsets.UTF_8);
     }
 
     @GetMapping("/{id}/executar")
     public String execute(@PathVariable(value = "id") long id, Model model) {
         pfs.executa(id);
-        return "redirect:/filtro";
+        return "redirect:/filtro?msg="
+                + URLEncoder.encode("Filtro #" + id + " será executado em instantes.", StandardCharsets.UTF_8);
     }
 
     @GetMapping("/{id}/deletar")
     public String deletarFiltro(@PathVariable(value = "id") long id, Model model) {
         filtroService.removeFiltro(id);
-        return "redirect:/filtro";
+        return "redirect:/filtro?msg="
+                + URLEncoder.encode("O filtro #" + id + " foi removido.", StandardCharsets.UTF_8);
+
     }
 
     @PostMapping(value = "/comparador")
-    public String adicionaComparador(FiltroComparadorDTO filtroComparadorDTO) {
+    public String adicionaCriterio(FiltroComparadorDTO filtroComparadorDTO) {
         FiltroVO filtroVO = new FiltroVO();
         filtroVO.setId(filtroComparadorDTO.getIdFiltro());
-        FiltroComparadorVO filtroComparadorVO = new FiltroComparadorVO();
-        filtroComparadorDTO.preencheVO(filtroComparadorVO);
-        filtroComparadorVO.setFiltroVO(filtroVO);
-        filtroService.adicionaComparador(filtroComparadorVO);
-        return "redirect:/filtro/" + filtroVO.getId();
+        FiltroCriterioVO filtroCriterioVO = new FiltroCriterioVO();
+        filtroComparadorDTO.preencheVO(filtroCriterioVO);
+        filtroCriterioVO.setFiltroVO(filtroVO);
+        FiltroCriterioVO fcvo = filtroService.adicionaCriterio(filtroCriterioVO);
+        return "redirect:/filtro/" + filtroVO.getId() + "?msg="
+                + URLEncoder.encode(
+                "Critério #" + fcvo.getId() + " foi adicionado com sucesso.", StandardCharsets.UTF_8);
     }
 
 }

@@ -20,12 +20,12 @@ public interface FiltroRepository extends JpaRepository<FiltroVO, Long> {
     @Modifying
     Integer deleteFiltroById(Long id);
 
-    @Query("delete from FiltroComparadorVO c where c.id = :idComparador and c.filtroVO.id = :idFiltro")
+    @Query("delete from FiltroCriterioVO c where c.id = :idComparador and c.filtroVO.id = :idFiltro")
     @Modifying
     Integer deleteComparadorDoFiltroById(Long idFiltro, Long idComparador);
 
     @Modifying
-    @Query("delete from FiltroComparadorVO c where c.filtroVO.id = :idFiltro")
+    @Query("delete from FiltroCriterioVO c where c.filtroVO.id = :idFiltro")
     Integer deleteTodosComparadorDoFiltro(Long idFiltro);
 
     @Modifying

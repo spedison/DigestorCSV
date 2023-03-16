@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{header :: header ('Inserir Filtro')}"/>
+
+<head th:replace="~{header :: header ('Inserir Filtro', 'Lista os filtros já cadastrados e mostra o seu estado atual')}"/>
 <head>
     <meta http-equiv="refresh" content="30">
-    <script src="/datatable.js"></script>
 </head>
 
-<body>
-<div th:replace="~{menu :: menu}"></div>
+<body class="">
 
-<div class="container">
+
+<div th:replace="~{menu :: menu_top}"></div>
+
+<div class="container-fluid">
 
     <head th:replace="~{header :: titulo_pagina ('Listagem - Filtro em Arquivos')}"/>
 
     <div class="row">
-        <div class="col">
-            <!-- <form action="#" th:action="@{/filtroVO/}" th:object="${filtroVOS}"> -->
-
-            <table id="dataTable" class="display">
-                <thead class="thead-dark">
+        <div class="col offset-s10 s2 center" style="position: fixed">
+            <a class="btn-floating btn-large waves-effect waves-light red" th:href="@{/filtro/novo}">
+                <i class="material-icons">add</i>
+            </a>
+        </div>
+        <!-- div class="col s2">&nbsp;</div -->
+        <div class="col offset-s1 s10 bottom-5">
+            <table id="dataTable" name="dataTable" class="display" style="width:100%">
+                <thead>
                 <tr>
                     <th>#</th>
                     <th>Data Criação</th>
@@ -31,40 +37,46 @@
                     <th colspan="3">Ações</th>
                 </tr>
                 </thead>
-                <tbody class="table-striped">
-                <tr th:each="filtroVO:${filtroVOS}">
-                    <td th:text="${filtroVO.getId()}"></td>
-                    <td th:text="${#temporals.format(filtroVO.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"></td>
-                    <td th:text="${filtroVO.getEstado() + filtroVO.getNomeTarefas()}"></td>
-                    <td th:text="${filtroVO.getDiretorioEntrada()}"></td>
-                    <td th:text="${filtroVO.getDiretorioSaida()}"></td>
-                    <td th:text="${#temporals.format(filtroVO.getDtInicio(), 'dd/MM/yyyy hh:mm:ss')}"></td>
-                    <td th:text="${#temporals.format(filtroVO.getDtFim(), 'dd/MM/yyyy hh:mm:ss')}"></td>
-                    <td th:text="${#numbers.formatInteger(filtroVO.getNumeroLinhasProcessadas(),3,'POINT')}"></td>
+                <tbody>
+                <tr th:each="filtro:${filtros}">
+                    <td th:text="${filtro.getId()}"></td>
+                    <td th:text="${#temporals.format(filtro.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${filtro.getEstado() + filtro.getNomeTarefas()}"></td>
+                    <td th:text="${filtro.getDiretorioEntrada()}"></td>
+                    <td th:text="${filtro.getDiretorioSaida()}"></td>
+                    <td th:text="${#temporals.format(filtro.getDtInicio(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#temporals.format(filtro.getDtFim(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td th:text="${#numbers.formatInteger(filtro.getNumeroLinhasProcessadas(),3,'POINT')}"></td>
                     <td>
-                        <a th:href="@{/filtro/{id}(id=${filtroVO.id})}" class="btn btn-primary">
-                            <span class="glyphicon glyphicon glyphicon glyphicon-pencil"/>
-                        </a>
+                        <a th:replace="icons :: editar(@{/filtro/{id}(id=${filtro.id})})"/>
                     </td>
                     <td>
-                        <a th:href="@{'/filtro/'+${filtroVO.id}+'/deletar'}" class="btn btn-danger">
-                            <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
-                        </a>
+                        <a th:replace="icons :: executar(@{/filtro/{id}/executar(id=${filtro.id})})"/>
                     </td>
                     <td>
-                        <a th:href="@{'/filtro/' + ${filtroVO.id} +'/executar'}" class="btn btn-dark">
-                            <span class="glyphicon glyphicon glyphicon glyphicon-flash"/>
-                        </a>
+                        <a th:replace="icons :: remover(@{/filtro/{id}/deletar(id=${filtro.id})})"/>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
+        <div class="col s1"></div>
     </div>
-    <!-- </form> -->
 
-    <a th:href="@{/filtro/novo}">Adicionar Filtro</a>
 </div>
-<div th:replace="~{menu_botton :: menu}"></div>
+<footer th:replace="~{menu :: menu_bottom}"/>
+
+<!-- Include external files -->
+<div th:replace="~{menu :: jss}"/>
+
+<!-- Run JS initialize scripts -->
+<script th:replace="~{icons :: tooltip_js}"/>
+<div th:replace="~{menu :: menu_js}"/>
 </body>
+<script th:if="${!mensagem.isEmpty()}" th:inline="javascript">
+    $(document).ready(function () {
+        var msg = /*[[${mensagem}]]*/;
+        M.toast({html: msg});
+    });
+</script>
 </html>
