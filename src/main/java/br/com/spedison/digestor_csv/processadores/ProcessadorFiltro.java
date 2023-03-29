@@ -60,8 +60,12 @@ public class ProcessadorFiltro extends ProcessadorBase {
             BufferedWriter aEscrita = FileUtils.abreArquivoEscrita(arquivoSaida.toString(), getCharset());
 
             // Lê o header do Arquivo
-            arquivoEntrada.setHeader(aLeitura.readLine()); // Lê o cabeçalho
-            arquivoEntrada.incLinhasProcessadas();
+            if (!filtroVO.temHeader()) {
+                arquivoEntrada.setHeader(aLeitura.readLine()); // Lê o cabeçalho
+                arquivoEntrada.incLinhasProcessadas();
+            } else {
+                arquivoEntrada.setHeader(filtroVO.getHeader());
+            }
             // Escreve o Header na saida
             aEscrita.write(arquivoEntrada.getHeader());
             aEscrita.newLine();

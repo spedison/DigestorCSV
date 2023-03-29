@@ -1,7 +1,7 @@
 package br.com.spedison.digestor_csv.dto;
 
 import br.com.spedison.digestor_csv.model.FiltroCriterioVO;
-import br.com.spedison.digestor_csv.model.TipoComparacaoEnum;
+import br.com.spedison.digestor_csv.model.TipoCriterioEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,18 +15,18 @@ import java.math.BigDecimal;
 @Log4j2
 @AllArgsConstructor
 @NoArgsConstructor
-public class FiltroComparadorDTO {
+public class FiltroCriterioDTO {
     Long idFiltro;
     @EqualsAndHashCode.Include
-    Long idComparador;
-    private TipoComparacaoEnum tipoComparacao;
+    Long idCriterio;
+    private TipoCriterioEnum tipoComparacao;
     String strValor;
     BigDecimal mumValor1;
     BigDecimal mumValor2;
     String nomeColuna; // Nome da coluna no Header do 1o Arquivo
 
     public void preencheVO(FiltroCriterioVO compadorVO) {
-        compadorVO.setId(getIdComparador());
+        compadorVO.setId(getIdCriterio());
         compadorVO.setTipoComparacao(getTipoComparacao());
         compadorVO.setStrValor(getStrValor());
         compadorVO.setMumValor1(getMumValor1());

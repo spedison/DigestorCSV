@@ -26,7 +26,7 @@ public class FiltroCriterioVO {
     private FiltroVO filtroVO;
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    private TipoComparacaoEnum tipoComparacao;
+    private TipoCriterioEnum tipoComparacao;
     String strValor;
     BigDecimal mumValor1;
     BigDecimal mumValor2;
@@ -40,15 +40,18 @@ public class FiltroCriterioVO {
         try {
             return switch (tipoComparacao) {
                 case TXT_IGUAL -> valorColuna.equals(strValor);
+                case TXT_DIFERENTE -> !valorColuna.equals(strValor);
                 case TXT_CONTEM -> valorColuna.contains(strValor);
                 case TXT_NAO_CONTEM -> !valorColuna.contains(strValor);
                 case TXT_INICIA -> valorColuna.startsWith(strValor);
+                case TXT_NAO_INICIA -> !valorColuna.startsWith(strValor);
                 case TXT_TERMINA -> valorColuna.endsWith(strValor);
-                case NUM_ENTRE -> (new BigDecimal(strValor)).compareTo(mumValor1) > 0
-                        && (new BigDecimal(strValor)).compareTo(mumValor2) < 0;
-                case NUM_MAIOR -> (new BigDecimal(strValor)).compareTo(mumValor1) > 0;
-                case NUM_MENOR -> (new BigDecimal(strValor)).compareTo(mumValor1) < 0;
-                case NUM_IGUAL -> (new BigDecimal(strValor)).compareTo(mumValor1) == 0;
+                case TXT_NAO_TERMINA -> !valorColuna.endsWith(strValor);
+                case NUM_ENTRE -> (new BigDecimal(valorColuna)).compareTo(mumValor1) >= 0
+                        && (new BigDecimal(valorColuna)).compareTo(mumValor2) <= 0;
+                case NUM_MAIOR -> (new BigDecimal(valorColuna)).compareTo(mumValor1) > 0;
+                case NUM_MENOR -> (new BigDecimal(valorColuna)).compareTo(mumValor1) < 0;
+                case NUM_IGUAL -> (new BigDecimal(valorColuna)).compareTo(mumValor1) == 0;
                 case VAZIO -> false;
             };
         } catch (NumberFormatException nfe) {
@@ -65,16 +68,18 @@ public class FiltroCriterioVO {
      */
     public String getComparacao() {
         return switch (tipoComparacao) {
-            case TXT_INICIA, TXT_IGUAL,
-                    TXT_NAO_CONTEM, TXT_TERMINA,
+            case TXT_NAO_INICIA, TXT_INICIA, TXT_IGUAL, TXT_DIFERENTE,
+                    TXT_NAO_CONTEM, TXT_NAO_TERMINA, TXT_TERMINA,
                     TXT_CONTEM -> "Coluna " + getNomeColuna() + " " +
                     tipoComparacao.getTexto() + " \"" + getStrValor() + "\"";
+
             case NUM_ENTRE -> "Coluna " + getNomeColuna() + " " +
                     tipoComparacao.getTexto() + " " + getMumValor1() + " e " +
                     getMumValor2();
+
             case NUM_IGUAL, NUM_MAIOR, NUM_MENOR -> "Coluna " + getNomeColuna() + " " +
                     tipoComparacao.getTexto() + " " + getMumValor1();
-            case VAZIO -> "Sem nenhuma comparação. Favor remover a dicionar outra";
+            case VAZIO -> "Sem nenhuma comparação. Favor remover e adicionar outra";
         };
     }
 }

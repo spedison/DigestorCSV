@@ -3,7 +3,7 @@
 
 <head th:replace="~{header :: header ('Inserir Filtro', 'Lista os filtros já cadastrados e mostra o seu estado atual')}"/>
 <head>
-    <meta http-equiv="refresh" content="30">
+    <!-- meta http-equiv="refresh" content="30" -->
 </head>
 
 <body class="">
@@ -16,18 +16,18 @@
     <head th:replace="~{header :: titulo_pagina ('Listagem - Filtro em Arquivos')}"/>
 
     <div class="row">
-        <div class="col offset-s10 s2 center" style="position: fixed">
+        <div class="col offset-s11 s1 center" style="position: fixed">
             <a class="btn-floating btn-large waves-effect waves-light red" th:href="@{/filtro/novo}">
                 <i class="material-icons">add</i>
             </a>
         </div>
-        <!-- div class="col s2">&nbsp;</div -->
-        <div class="col offset-s1 s10 bottom-5">
-            <table id="dataTable" name="dataTable" class="display" style="width:100%">
+        <div class="col s12 bottom-5">
+            <table id="dataTable" name="dataTable" class="display w-100" >
                 <thead>
                 <tr>
                     <th>#</th>
                     <th>Data Criação</th>
+                    <th>Nome Tarefa</th>
                     <th>Estado</th>
                     <th>Diretório Entrada</th>
                     <th>Diretório saida</th>
@@ -41,6 +41,7 @@
                 <tr th:each="filtro:${filtros}">
                     <td th:text="${filtro.getId()}"></td>
                     <td th:text="${#temporals.format(filtro.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"></td>
+                    <td class="elipses" th:text="${filtro.getNomeDaTarefa()}" style="max-width: 10%;"></td>
                     <td th:text="${filtro.getEstado() + filtro.getNomeTarefas()}"></td>
                     <td th:text="${filtro.getDiretorioEntrada()}"></td>
                     <td th:text="${filtro.getDiretorioSaida()}"></td>
@@ -60,7 +61,6 @@
                 </tbody>
             </table>
         </div>
-        <div class="col s1"></div>
     </div>
 
 </div>
@@ -76,7 +76,18 @@
 <script th:if="${!mensagem.isEmpty()}" th:inline="javascript">
     $(document).ready(function () {
         var msg = /*[[${mensagem}]]*/;
-        M.toast({html: msg});
+
+        if (msg != "")
+            M.toast({html: msg});
     });
 </script>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        setTimeout(() => {
+            window.location.href = document.location.href.split("?")[0];
+        }, 15000);
+    });
+</script>
+
 </html>

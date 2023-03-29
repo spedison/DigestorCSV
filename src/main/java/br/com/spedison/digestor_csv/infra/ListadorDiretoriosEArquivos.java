@@ -61,10 +61,13 @@ public class ListadorDiretoriosEArquivos {
     public File lerPrimeiroDiretorioParaEntrada() {
         List<File> ret = new LinkedList<>();
         String diretorios = configuracaoService.getDiretorios().get(0);
-            try {
-                addInList(new File(diretorios), ret, 1L);
-            } catch (IOException ioe) {
-            }
+        try {
+            addInList(new File(diretorios), ret, 1L);
+        } catch (IOException ioe) {
+            return null;
+        }
+        if (ret.isEmpty())
+            return null;
         return ret.get(0);
     }
 }

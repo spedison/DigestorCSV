@@ -112,7 +112,7 @@
 
 <head th:replace="~{header :: titulo_pagina ('Adicionar/Alterar - Filtro em arquivos')}"/>
 
-
+<!-- somente a aba com 3 tabs.-->
 <div class="container">
     <div class="row">
         <div class="col s12">
@@ -122,34 +122,39 @@
                         Dados Filtro
                     </a>
                 </li>
-                <li id="fundo-tab-2" class="  tab col s3" th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }"><a
-                        id="tab-2" onclick="ativa(2)">Adicionar Critério</a></li>
-                <li id="fundo-tab-3" class="  tab col s3"><a id="tab-3" onclick="ativa(3)">Lista Critérios</a></li>
-                <li>
+                <li id="fundo-tab-2" class="  tab col s3" th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO') }">
+                    <a id="tab-2" onclick="ativa(2)">
+                        Adicionar Critério
+                    </a>
+                </li>
+                <li id="fundo-tab-3" class="  tab col s3">
+                    <a id="tab-3" onclick="ativa(3)">
+                        Lista Critérios
+                    </a>
+                </li>
+                <li> <!-- Volta para a lista de filtros. -->
                     <a class="btn btn-floating right waves-effect waves-light red" th:href="@{'/filtro'}">
                         <i class="material-icons">list</i>
                     </a>
-                    <!--<a class="btn btn-floating right waves-effect waves-light red" onclick="mensagem('bla bla teste...')">
-                        <i class="material-icons">test</i>
-                    </a>-->
                 </li>
             </ul>
         </div>
     </div>
 </div>
 
-<form th:action="@{/filtro}" th:object="${filtro}" method="POST" class="bottom-5" id="cartao-dados">
+<!-- Formulário para entrar com o dado básico do Filtro -->
+<form th:action="@{/filtro}" th:object="${filtro}"
+      method="POST" class="bottom-5"
+      id="cartao-dados" style="display: none">
+
     <input type=hidden th:field="*{id}"/>
 
     <div class="container">
         <div class="card" style="display: block">
-
             <div class="card-content">
-
                 <div class="row">
                     <span class="col s12 card-title">Dados do Filtro</span>
                 </div>
-
                 <div class="row">
                     <div class="col s12">
                         <label for="nomeTarefa">Nome da tarefa:</label>
@@ -158,8 +163,6 @@
                         <input type=text th:field="*{nomeDaTarefa}"/>
                     </div>
                 </div>
-
-
                 <div class="row">
                     <div class="col s12 ">
                         <label for="diretorioEntrada">Selecione Diretório de entrada:</label>
@@ -171,7 +174,6 @@
                         </select>
                     </div>
                 </div>
-
 
                 <div class="row">
                     <div class="col s12">
@@ -196,6 +198,21 @@
                 </div>
 
                 <div class="row">
+                    <div class="col s12">
+                        <label for="header">
+                            Header do Arquivo:
+                        </label>
+                    </div>
+                    <div class="col s12">
+                        <input
+                                type=text
+                                th:field="*{header}"
+                                placeholder="Se o arquivo não tem header, pode colocá-lo aqui para ele colocar nos arquivos de saida e apareça adequadamente no combo de colunas"
+                        />
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col s12 m6 xl6 l6">
                         <p th:text="*{'Data/Hora Criação : '+ #temporals.format(dataCriacao, 'dd/MM/yyyy HH:mm:ss')}"/>
                     </div>
@@ -209,7 +226,7 @@
                         <button type="submit" class="btn w-100">Gravar</button>
                     </div>
                     <div class="col s6"
-                         th:if="${comparadores.size() > 0 && #strings.equals(filtro.estado, 'NAO_INICIADO') }">
+                         th:if="${criterios.size() > 0 && #strings.equals(filtro.estado, 'NAO_INICIADO') }">
                         <a class="btn" style="width: 100%" th:href="@{'/filtro/'+ ${filtro.id} + '/executar'}">
                             Executar
                         </a>
@@ -220,8 +237,8 @@
     </div>
 </form>
 
-
-<form th:action="@{'/filtro/comparador'}" th:object="${comparador}"
+<!-- Formulário de cadastro das condições -->
+<form th:action="@{'/filtro/criterio'}" th:object="${criterio}"
       method="POST" class="bottom-5"
       id="cartao-add-condicao" style="display: none">
 
@@ -234,7 +251,7 @@
                     <span class="col s12 card-title">Critério do Filtro</span>
                 </div>
 
-                <input type=hidden th:field="*{idComparador}">
+                <input type=hidden th:field="*{idCriterio}">
                 <input type=hidden th:field="*{idFiltro}">
 
                 <div class="row">
@@ -258,7 +275,7 @@
                     </div>
                     <div class="col s12">
                         <select class="" th:field="*{tipoComparacao}" onchange="selecionaTipoComparacao()">
-                            <option th:each="state : ${T(br.com.spedison.digestor_csv.model.TipoComparacaoEnum).values()}"
+                            <option th:each="state : ${T(br.com.spedison.digestor_csv.model.TipoCriterioEnum).values()}"
                                     th:value="${state}"
                                     th:text="${state.texto}"></option>
                         </select>
@@ -335,11 +352,11 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr th:each="comparador : ${comparadores}">
-                                <td th:text="${comparador.id}"/>
-                                <td th:text="${comparador.getComparacao()}"/>
+                            <tr th:each="criterio : ${criterios}">
+                                <td th:text="${criterio.id}"/>
+                                <td th:text="${criterio.getComparacao()}"/>
                                 <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">
-                                    <a th:replace="icons ::remover( @{'/filtro/' + ${filtro.id} + '/comparador/' + ${comparador.id} + '/deletar'} )"/>
+                                    <a th:replace="icons ::remover( @{'/filtro/' + ${filtro.id} + '/criterio/' + ${criterio.id} + '/deletar'} )"/>
                                 </td>
                             </tr>
                             </tbody>
@@ -368,6 +385,14 @@
     $(document).ready(function () {
         var msg = /*[[${mensagem}]]*/;
         M.toast({html: msg});
+    });
+</script>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        var tab = /*[[${mostraTab}]]*/;
+        ativa(tab);
+        $('.tooltipped').tooltip();
     });
 </script>
 

@@ -1,13 +1,19 @@
 package br.com.spedison.digestor_csv.model;
 
+import br.com.spedison.digestor_csv.infra.FileUtils;
+import br.com.spedison.digestor_csv.infra.FormatadorData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @AllArgsConstructor
@@ -47,12 +53,19 @@ public class FiltroVO {
     @Column(nullable = true)
     private String jobId;
 
+    @Column(nullable = true, length = 1024)
+    private String header;
+
     public String getNomeTarefas(){
         return "";
         //return getEstado().toString();
         //if (getJobId() == null || getJobId().isBlank())
         //    return "";
         //return " Tarefa :: " + getJobId();
+    }
+
+    public boolean temHeader() {
+        return !(Objects.isNull(header) || header.isBlank());
     }
 
 }

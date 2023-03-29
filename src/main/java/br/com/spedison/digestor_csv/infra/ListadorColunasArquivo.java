@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @Log4j2
@@ -34,19 +35,34 @@ public class ListadorColunasArquivo {
     @Autowired
     RemoveColunasService removeColunasService;
 
+    private List<String> getColunasObjeto(String header) {
+        if (Objects.isNull(header) || header.isBlank())
+            return null;
+
+        String separador = configuracaoService.getSeparador();
+        return Arrays.stream(header.split(separador)).toList();
+    }
+
+
     public List<String> getListaColunasRemoveColunas(Long id) {
         RemoveColunasVO agrupa = removeColunasService.getAgrupaSemCampos(id);
         return getListColunas(agrupa.getDiretorioEntrada());
     }
+
     public List<String> getListaColunasAgrupa(Long idAgrupa) {
         AgrupaVO agrupa = agrupaService.getAgrupaSemCampos(idAgrupa);
         return getListColunas(agrupa.getDiretorioEntrada());
     }
 
     public List<String> getListaColunasFiltro(Long idFiltro) {
-        FiltroVO fitro = filtroService.getFiltroSemComparadores(idFiltro);
-        return getListColunas(fitro.getDiretorioEntrada());
+        FiltroVO filtro = filtroService.getFiltroSemCriterios(idFiltro);
+        List<String> ret = getColunasObjeto(filtro.getHeader());
+        if (Objects.isNull(ret))
+            return getListColunas(filtro.getDiretorioEntrada());
+        else
+            return ret;
     }
+
     @Cacheable("colunas-arquivos-dir")
     public List<String> getListColunas(String dirEntrada) {
         String separador = configuracaoService.getSeparador();

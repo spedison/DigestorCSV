@@ -10,7 +10,7 @@ public class StringUtils {
     }
 
     public static Charset getCharset(String nome) {
-        return switch (nome.toLowerCase()) {
+        return switch (nome.trim().toLowerCase()) {
             case "utf8" -> StandardCharsets.UTF_8;
             case "utf16" -> StandardCharsets.UTF_16;
             case "ascii" -> StandardCharsets.US_ASCII;
