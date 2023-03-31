@@ -5,11 +5,23 @@
 </a>
 
 <a th:fragment="executar( link )" th:href="${link}">
-    <i class="material-icons ">play_circle_outline</i>
+    <i class="material-icons ">bolt</i>
+</a>
+
+<a th:fragment="copiar( link )" th:href="${link}">
+    <i class="material-icons ">file_copy</i>
 </a>
 
 <a th:fragment="remover( link )" th:href="${link}">
     <i class="material-icons">delete</i>
+</a>
+
+<a th:fragment="analise( link )" th:href="${link}">
+    <i class="material-icons">analytics</i>
+</a>
+
+<a th:fragment="analise_nova_janela( link )" th:href="${link}" target="_blank">
+    <i class="material-icons">analytics</i>
 </a>
 
 <script th:fragment="tooltip_js">

@@ -1,8 +1,6 @@
 package br.com.spedison.digestor_csv.service;
 
-import br.com.spedison.digestor_csv.infra.FileUtils;
 import br.com.spedison.digestor_csv.infra.FiltroVoUtils;
-import br.com.spedison.digestor_csv.infra.FormatadorData;
 import br.com.spedison.digestor_csv.model.ConfiguracaoVO;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
 import br.com.spedison.digestor_csv.model.FiltroCriterioVO;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,7 +90,7 @@ public class FiltroService {
                 null, "Filtro Tarefa 1", filtroVO.getDiretorioEntrada(),
                 filtroVO.getDiretorioSaida(), LocalDateTime.now(),
                 EstadoProcessamentoEnum.NAO_INICIADO,
-                new LinkedList<FiltroCriterioVO>(), null, null, -1L, true, null, "");
+                new LinkedList<>(), null, null, -1L, true, null, "");
         return filtroRepository.save(f);
     }
 
@@ -129,8 +126,7 @@ public class FiltroService {
     }
 
     public FiltroVO getFiltroComComparadores(long id) {
-        FiltroVO f = filtroRepository.buscaPorIdComComparador(id);
-        return f;
+        return filtroRepository.buscaPorIdComComparador(id);
     }
 
     public FiltroVO getFiltroSemCriterios(long id) {
@@ -171,6 +167,8 @@ public class FiltroService {
 
         FiltroVO novo = new FiltroVO();
         BeanUtils.copyProperties(v, novo);
+
+        novo.setNumeroLinhasProcessadas(0L);
         novo.setComparadores(new LinkedList<>());
         v.getComparadores().forEach(p -> {
                 FiltroCriterioVO pp = new FiltroCriterioVO();
@@ -183,7 +181,7 @@ public class FiltroService {
         novo.setDataCriacao(LocalDateTime.now());
         novo.setId(null);
         filtroRepository.save(novo);
-        novo.getComparadores().forEach(filtroComparadorRepository::save);
+        filtroComparadorRepository.saveAll(novo.getComparadores());
         return novo;
     }
 }
