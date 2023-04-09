@@ -1,7 +1,6 @@
 package br.com.spedison.digestor_csv.service;
 
 import br.com.spedison.digestor_csv.infra.FiltroVoUtils;
-import br.com.spedison.digestor_csv.model.ConfiguracaoVO;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
 import br.com.spedison.digestor_csv.model.FiltroCriterioVO;
 import br.com.spedison.digestor_csv.model.FiltroVO;
@@ -34,7 +33,7 @@ public class FiltroService {
 
     public FiltroVO criaNovoFiltro(String diretorioEntrada) {
         FiltroVO ret = new FiltroVO();
-        String dirSaida = configuracaoService.getConfiguracao(ConfiguracaoVO.nomes[2]);
+        String dirSaidaConfiguracao = configuracaoService.getDirSaida();
 
         //ComparadorVO comp = new ComparadorVO(null, ret, TipoComparacaoEnum.TXT_CONTEM, "teste", null, null, -1, "TODALINHA");
         List<FiltroCriterioVO> comparadores = new LinkedList<>();
@@ -44,7 +43,7 @@ public class FiltroService {
         ret.setDataCriacao(LocalDateTime.now());
         ret.setDiretorioEntrada(diretorioEntrada);
         ret.setNomeDaTarefa("Nome da Tarefa");
-        filtroVoUtils.formataDirSaida(ret, dirSaida);
+        filtroVoUtils.formataDirSaida(ret, dirSaidaConfiguracao);
         ret.setComparadores(comparadores);
         ret.setNumeroLinhasProcessadas(0L);
         ret.setTodasCondicoesDevemAtender(false);
@@ -71,12 +70,12 @@ public class FiltroService {
     @Transactional
     public FiltroVO atualizaDiretorios(FiltroVO filtroVO) {
         Optional<FiltroVO> paraSalvar = filtroRepository.findById(filtroVO.getId());
-        String dirSaida = configuracaoService.getConfiguracao(ConfiguracaoVO.nomes[2]);
+        String dirSaidaConfiguracao = configuracaoService.getDirSaida();
         if (paraSalvar.isPresent()) {
             paraSalvar.get().setNomeDaTarefa(filtroVO.getNomeDaTarefa());
             paraSalvar.get().setDiretorioEntrada(filtroVO.getDiretorioEntrada());
             paraSalvar.get().setTodasCondicoesDevemAtender(filtroVO.getTodasCondicoesDevemAtender());
-            filtroVoUtils.formataDirSaida(paraSalvar.get(), dirSaida);
+            filtroVoUtils.formataDirSaida(paraSalvar.get(), dirSaidaConfiguracao);
             paraSalvar.get().setHeader(filtroVO.getHeader());
             filtroRepository.save(paraSalvar.get());
             return paraSalvar.get();
@@ -161,6 +160,7 @@ public class FiltroService {
     @Transactional
     public FiltroVO copiar(long idFiltro) {
         FiltroVO v = filtroRepository.buscaPorIdComComparador(idFiltro);
+        String dirSaidaConfiguracao = configuracaoService.getDirSaida();
 
         if (v == null)
             return null;
@@ -180,6 +180,7 @@ public class FiltroService {
         novo.setEstado(EstadoProcessamentoEnum.NAO_INICIADO);
         novo.setDataCriacao(LocalDateTime.now());
         novo.setId(null);
+        filtroVoUtils.formataDirSaida(novo, dirSaidaConfiguracao);
         filtroRepository.save(novo);
         filtroComparadorRepository.saveAll(novo.getComparadores());
         return novo;

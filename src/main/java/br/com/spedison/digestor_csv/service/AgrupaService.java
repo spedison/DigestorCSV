@@ -1,18 +1,21 @@
 package br.com.spedison.digestor_csv.service;
 
-import br.com.spedison.digestor_csv.infra.FileUtils;
+import br.com.spedison.digestor_csv.infra.AgrupaVoUtils;
 import br.com.spedison.digestor_csv.infra.FormatadorData;
-import br.com.spedison.digestor_csv.model.*;
+import br.com.spedison.digestor_csv.model.AgrupaCampoVO;
+import br.com.spedison.digestor_csv.model.AgrupaVO;
+import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
 import br.com.spedison.digestor_csv.repository.AgrupaCampoRepository;
 import br.com.spedison.digestor_csv.repository.AgrupaRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AgrupaService {
@@ -25,6 +28,9 @@ public class AgrupaService {
 
     @Autowired
     FormatadorData formatadorData;
+
+    @Autowired
+    AgrupaVoUtils agrupaVoUtils;
 
     public AgrupaVO criaNovoAgrupa(String diretorioEntrada) {
         AgrupaVO ret = new AgrupaVO();
@@ -41,14 +47,8 @@ public class AgrupaService {
     }
 
     private void defineDiretorioSaida(AgrupaVO ret) {
-        String dirSaida = configuracaoService.getConfiguracao(ConfiguracaoVO.nomes[2]);
-        String dirData = formatadorData.formataDataParaArquivos(ret.getDataCriacao());
-        String dirNomeTarefa = FileUtils.ajustaNome(ret.getNomeTarefa());
-        ret.setDiretorioSaida(Paths.get(
-                dirSaida, "agrupa",
-                dirData + "__" +
-                        dirNomeTarefa).toString()
-        );
+        String dirSaida = configuracaoService.getDirSaida();
+        agrupaVoUtils.formataDirSaida(ret,dirSaida);
     }
 
     public List<Integer> pegaCamposParaAgrupar(Long idAgrupa) {
@@ -75,9 +75,11 @@ public class AgrupaService {
     }
 
     @Transactional
-    public Integer salvaDiretoriosETarefa(AgrupaVO agrupaVO) {
-        AgrupaVO agrupaBanco = agrupaRepository.buscaPorIdSemCampos(agrupaVO.getId());
-        agrupaVO.setDataCriacao(agrupaBanco.getDataCriacao());
+    public Integer gravaDiretoriosENomeDaTarefa(AgrupaVO agrupaVO) {
+        Optional<AgrupaVO> agrupaBanco = agrupaRepository.buscaPorIdSemCampos(agrupaVO.getId());
+        if (agrupaBanco.isEmpty())
+            return -1;
+        agrupaVO.setDataCriacao(agrupaBanco.get().getDataCriacao());
         defineDiretorioSaida(agrupaVO);
         return agrupaRepository.atualizaDiretoriosETarefa(
                 agrupaVO.getId(),
@@ -88,33 +90,33 @@ public class AgrupaService {
 
     @Transactional
     public AgrupaVO registrarInicioProcessamento(Long idAgrupa, String jobId) {
-        AgrupaVO f = agrupaRepository.buscaPorIdSemCampos(idAgrupa);
-        if (f == null)
+        Optional<AgrupaVO> f = agrupaRepository.buscaPorIdSemCampos(idAgrupa);
+        if (f.isEmpty())
             return null;
-        f.setEstado(EstadoProcessamentoEnum.INICIANDO);
-        f.setDtInicio(LocalDateTime.now());
-        f.setJobId(jobId);
-        return agrupaRepository.save(f);
+        f.get().setEstado(EstadoProcessamentoEnum.INICIANDO);
+        f.get().setDtInicio(LocalDateTime.now());
+        f.get().setJobId(jobId);
+        return agrupaRepository.save(f.get());
     }
 
     @Transactional
     public AgrupaVO registrarFimProcessamento(Long idAgrupa, Long numeroDeLinhasProcessadas) {
-        AgrupaVO f = agrupaRepository.buscaPorIdSemCampos(idAgrupa);
-        if (f == null)
+        Optional<AgrupaVO> f = agrupaRepository.buscaPorIdSemCampos(idAgrupa);
+        if (f.isEmpty())
             return null;
-        f.setEstado(EstadoProcessamentoEnum.TERMINADO);
-        f.setDtFim(LocalDateTime.now());
-        f.setNumeroLinhasProcessadas(numeroDeLinhasProcessadas);
-        return agrupaRepository.save(f);
+        f.get().setEstado(EstadoProcessamentoEnum.TERMINADO);
+        f.get().setDtFim(LocalDateTime.now());
+        f.get().setNumeroLinhasProcessadas(numeroDeLinhasProcessadas);
+        return agrupaRepository.save(f.get());
     }
 
     @Transactional
     public AgrupaVO registrarProcessando(Long idAgrupa) {
-        AgrupaVO f = agrupaRepository.buscaPorIdSemCampos(idAgrupa);
-        if (f == null)
+        Optional<AgrupaVO> f = agrupaRepository.buscaPorIdSemCampos(idAgrupa);
+        if (f.isEmpty())
             return null;
-        f.setEstado(EstadoProcessamentoEnum.PROCESSANDO);
-        return agrupaRepository.save(f);
+        f.get().setEstado(EstadoProcessamentoEnum.PROCESSANDO);
+        return agrupaRepository.save(f.get());
     }
 
     public AgrupaVO getAgrupaComCampos(long id) {
@@ -122,7 +124,11 @@ public class AgrupaService {
     }
 
     public AgrupaVO getAgrupaSemCampos(long id) {
-        return agrupaRepository.buscaPorIdSemCampos(id);
+        Optional<AgrupaVO> ret = agrupaRepository.buscaPorIdSemCampos(id);
+        if (ret.isEmpty()) {
+            throw new RegistroNaoLocalizadoException("Agrupamento " + id + " Não localizado");
+        }
+        return ret.get();
     }
 
     @Transactional
@@ -149,4 +155,33 @@ public class AgrupaService {
     public void removeCampo(long idAgrupa, long idCampo) {
         agrupaCamposRepository.removeByIdAndAgrupaVO_Id(idCampo, idAgrupa);
     }
+
+    @Transactional
+    public AgrupaVO copiar(long idFiltro) {
+        AgrupaVO v = agrupaRepository.buscaPorIdComCampos(idFiltro);
+
+        if (v == null)
+            return null;
+
+        AgrupaVO novo = new AgrupaVO();
+        BeanUtils.copyProperties(v, novo);
+
+        novo.setNumeroLinhasProcessadas(0L);
+        novo.setCamposParaAgrupar(new LinkedList<>());
+        v.getCamposParaAgrupar().forEach(p -> {
+            AgrupaCampoVO pp = new AgrupaCampoVO();
+            BeanUtils.copyProperties(p, pp);
+            pp.setId(null);
+            pp.setAgrupaVO(novo);
+            novo.getCamposParaAgrupar().add(pp);
+        });
+        novo.setEstado(EstadoProcessamentoEnum.NAO_INICIADO);
+        novo.setDataCriacao(LocalDateTime.now());
+        novo.setId(null);
+        defineDiretorioSaida(novo);
+        agrupaRepository.save(novo);
+        agrupaCamposRepository.saveAll(novo.getCamposParaAgrupar());
+        return novo;
+    }
+
 }

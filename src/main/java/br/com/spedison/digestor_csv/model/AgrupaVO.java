@@ -40,9 +40,7 @@ public class AgrupaVO {
     private String nomeTarefa;
 
     public String getNomeTarefas() {
-        if (getJobId() == null || getJobId().isBlank())
-            return "";
-        return " Tarefa :: " + getJobId();
+        return getEstado().toString();
     }
 
     public List<AgrupaCampoVO> getCamposOrdenados() {

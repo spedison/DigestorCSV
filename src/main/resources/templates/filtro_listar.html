@@ -1,13 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{header :: header ('Inserir Filtro', 'Lista os filtros já cadastrados e mostra o seu estado atual')}"/>
-<!-- head>
-    <meta http-equiv="refresh" content="30"/>
-</head -->
+<head th:replace="~{header :: header ('Listagem de Filtros', 'Lista os filtros já cadastrados e mostra o seu estado atual')}"/>
 
-<body class="">
-
+<body>
 
 <div th:replace="~{menu :: menu_top}"></div>
 
@@ -17,7 +13,7 @@
 
     <div class="row">
         <div class="col offset-s11 s1 center" style="position: fixed">
-            <a class="btn-floating btn-large waves-effect waves-light red" th:href="@{/filtro/novo}">
+            <a class="btn-floating btn-large waves-effect waves-light red" th:href="@{/filtro/criar}">
                 <i class="material-icons">add</i>
             </a>
         </div>
@@ -79,7 +75,6 @@
             </table>
         </div>
     </div>
-
 </div>
 <footer th:replace="~{menu :: menu_bottom}"/>
 
@@ -90,14 +85,8 @@
 <script th:replace="~{icons :: tooltip_js}"/>
 <div th:replace="~{menu :: menu_js}"/>
 </body>
-<script th:if="${!mensagem.isEmpty()}" th:inline="javascript">
-    $(document).ready(function () {
-        var msg = /*[[${mensagem}]]*/;
+<script th:replace="~{menu :: toast_js (${mensagem})}"/>
 
-        if (msg != "")
-            M.toast({html: msg});
-    });
-</script>
 
 <script th:inline="javascript">
     $(document).ready(function () {

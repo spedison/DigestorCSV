@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface AgrupaRepository extends JpaRepository<AgrupaVO, Long> {
 
@@ -20,7 +20,7 @@ public interface AgrupaRepository extends JpaRepository<AgrupaVO, Long> {
     AgrupaVO buscaPorIdComCampos(Long id);
 
     @Query("SELECT a FROM AgrupaVO a where a.id = :id")
-    AgrupaVO buscaPorIdSemCampos(Long id);
+    Optional<AgrupaVO> buscaPorIdSemCampos(Long id);
 
     @Query("select max(a.ordem)+1 from AgrupaCampoVO a where a.agrupaVO.id = :idAgrupa")
     Integer getProximaOrdem(Long idAgrupa);

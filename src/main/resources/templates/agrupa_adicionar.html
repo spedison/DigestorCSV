@@ -1,42 +1,172 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{header :: header ('Agrupar Arquivos :: Adicionar/Editar')}"/>
-<head>
-    <script src="/datatable.js"></script>
-</head>
+<head th:replace="~{header :: header ('Agrupar Arquivos', 'Cadastro de Agrupamento de Arquivos')}"/>
 
 <body>
-<div th:replace="~{menu :: menu}"></div>
+<div th:replace="~{menu :: menu_top}"/>
 
-<form action="#" th:action="@{/agrupa}" th:object="${agrupa}" method="POST" class="container">
-    <head th:replace="~{header :: titulo_pagina ('Adicionar/Alterar - Agrupar dados de arquivos por colunas')}"/>
-    <div class="container justify-content-center">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">Dados do Agrupamento</h3>
-                <hr class="hr"/>
-                <input type=hidden th:field="*{id}">
+<script>
+    function ativa(aba) {
 
-                <div class="row mt-4">
-                    <div class="col">
-                        <label for="nomeTarefa">Nome da tarefa:</label>
-                    </div>
+        var tabPanel1 = document.getElementById("cartao-dados");
+        var tabPanel2 = document.getElementById("cartao-add-agrupamento");
+        var tabPanel3 = document.getElementById("cartao-list-agrupamento");
+        if (tabPanel2 == null)
+            tabPanel2 = tabPanel3;
+
+        var tab1 = document.getElementById("tab-1");
+        var tab2 = document.getElementById("tab-2");
+        var tab3 = document.getElementById("tab-3");
+        if (tab2 == null)
+            tab2 = tab3;
+
+        var fundoTab1 = document.getElementById("fundo-tab-1");
+        var fundoTab2 = document.getElementById("fundo-tab-2");
+        var fundoTab3 = document.getElementById("fundo-tab-3");
+        if (fundoTab2 == null)
+            fundoTab2 = fundoTab3;
+
+        switch (aba) {
+            case 1:
+                tabPanel1.style.display = "block";
+                tabPanel2.style.display = "none";
+                tabPanel3.style.display = "none";
+
+                tab2.classList.remove("active");
+                tab3.classList.remove("active");
+                tab1.classList.add("active");
+
+                fundoTab2.classList.remove("red");
+                fundoTab2.classList.remove("lighten-5");
+                fundoTab3.classList.remove("red");
+                fundoTab3.classList.remove("lighten-5");
+                fundoTab1.classList.add("red");
+                fundoTab1.classList.add("lighten-5");
+
+                break;
+            case 2:
+                tabPanel2.style.display = "block";
+                tabPanel1.style.display = "none";
+                tabPanel3.style.display = "none";
+                tab1.classList.remove("active");
+                tab3.classList.remove("active");
+                tab2.classList.add("active");
+
+                fundoTab1.classList.remove("red");
+                fundoTab1.classList.remove("lighten-5");
+                fundoTab3.classList.remove("red");
+                fundoTab3.classList.remove("lighten-5");
+                fundoTab2.classList.add("red");
+                fundoTab2.classList.add("lighten-5");
+
+                break;
+            case 3:
+                tabPanel3.style.display = "block";
+                tabPanel1.style.display = "none";
+                tabPanel2.style.display = "none";
+                tab1.classList.remove("active");
+                tab2.classList.remove("active");
+                tab3.classList.add("active");
+
+                fundoTab2.classList.remove("red");
+                fundoTab2.classList.remove("lighten-5");
+                fundoTab1.classList.remove("red");
+                fundoTab1.classList.remove("lighten-5");
+
+                fundoTab3.classList.add("red");
+                fundoTab3.classList.add("lighten-5");
+                break;
+        }
+    }
+
+    function selecionaTipoComparacao() {
+
+        var txtCombo = document.getElementById("tipoComparacao").value;
+
+        var divTexto = document.getElementById("texto");
+        var divNumeroInicio = document.getElementById("numero_inicio");
+        var divNumeroFim = document.getElementById("numero_fim");
+
+        if (txtCombo == "VAZIO") {
+            divNumeroInicio.style.display = "none";
+            divNumeroFim.style.display = "none";
+            divTexto.style.display = "none";
+        } else if (txtCombo.slice(0, 3) == "TXT") {
+            divNumeroInicio.style.display = "none";
+            divNumeroFim.style.display = "none";
+            divTexto.style.display = "block";
+        } else if (txtCombo == "NUM_ENTRE") {
+            divNumeroInicio.style.display = "block";
+            divNumeroFim.style.display = "block";
+            divTexto.style.display = "none";
+        } else {
+            divNumeroInicio.style.display = "block";
+            divNumeroFim.style.display = "none";
+            divTexto.style.display = "none";
+        }
+    }
+
+</script>
+
+<head th:replace="~{header :: titulo_pagina ('Adicionar/Alterar - Agrupamentos de arquivos')}"/>
+
+<!-- somente monta a aba com 3 tabs.-->
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs tabs-fixed-width">
+                <li id="fundo-tab-1" class="  tab col s3 red lighten-5">
+                    <a id="tab-1" class="active" onclick="ativa(1)">
+                        Dados Agrupamento
+                    </a>
+                </li>
+                <li id="fundo-tab-2" class="  tab col s3">
+                    <a id="tab-2" onclick="ativa(2)">
+                        Adicionar Campo Agrupamento
+                    </a>
+                </li>
+                <li id="fundo-tab-3" class="  tab col s3">
+                    <a id="tab-3" onclick="ativa(3)">
+                        Lista Campos Agrupamento
+                    </a>
+                </li>
+                <li> <!-- Volta para a lista de filtros. -->
+                    <a class="btn btn-floating right waves-effect waves-light red" th:href="@{'/agrupa'}">
+                        <i class="material-icons">list</i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- Fim da montagem de Abas com 3 Tabs -->
+
+<!-- Formulário para entrar com o dado básico do Agrupamento -->
+<form th:action="@{/agrupa}" th:object="${agrupa}" method="POST" class="bottom-5" id="cartao-dados"
+      style="display: none">
+
+    <input type=hidden th:field="*{id}">
+    <div class="container">
+        <div class="card" style="display: block">
+            <div class="card-content">
+                <div class="row">
+                    <span class="col s12 card-title">Dados do Agrupamento</span>
                 </div>
 
-                <div class="row mt-2">
-                    <div class="col">
+                <div class="row">
+                    <div class="col s12">
+                        <label for="nomeTarefa">Nome da tarefa:</label>
+                    </div>
+                    <div class="col s12">
                         <input type=text th:field="*{nomeTarefa}" class="form-control">
                     </div>
                 </div>
 
-                <div class="row mt-4">
-                    <div class="col-12">
+                <div class="row">
+                    <div class="col s12">
                         <label class="form-label" for="diretorioEntrada">Selecione Diretório de entrada:</label>
                     </div>
-                </div>
-
-                <div class="row mt-2">
-                    <div class="col">
+                    <div class="col s12">
                         <select class="form-control form-control-lg" th:field="*{diretorioEntrada}">
                             <option th:each="dirEntrada : ${diretoriosEntrada}" th:value="${dirEntrada}"
                                     th:text="${dirEntrada}"></option>
@@ -45,32 +175,29 @@
                 </div>
 
 
-                <div class="row mt-4">
-                    <div class="col">
+                <div class="row">
+                    <div class="col s12">
                         <label for="diretorioSaida">Diretório Saída:</label>
                     </div>
-                </div>
-
-                <div class="row mt-2">
-                    <div class="col">
-                        <input type=text readonly th:field="*{diretorioSaida}" class="form-control">
+                    <div class="col s12">
+                        <input disabled type=text class="validate" th:field="*{diretorioSaida}">
                     </div>
                 </div>
 
-                <div class="row mt-4">
-                    <div class="col col-6">
+                <div class="row">
+                    <div class="col s6">
                         <p th:text="*{'Data/Hora Criação : '+ #temporals.format(dataCriacao, 'dd/MM/yyyy HH:mm:ss')}"/>
                     </div>
-                    <div class="col col-6">
+                    <div class="col s6">
                         <p th:text="${'Estado Atual :' + agrupa.estado}"/>
                     </div>
                 </div>
 
-                <div class="row mt-5 p-5">
-                    <div class="col-6" th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO') }">
+                <div class="row ">
+                    <div class="col s6" th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO') }">
                         <button type="submit" class="btn btn-info w-100">Gravar</button>
                     </div>
-                    <div class="col-6"
+                    <div class="col s6"
                          th:if="${agrupa.camposParaAgrupar.size() > 0 && #strings.equals(agrupa.estado, 'NAO_INICIADO') }">
                         <a th:href="@{'/agrupa/'+ ${agrupa.id} + '/executar'}" class="btn btn-info w-100" role="button"
                            data-bs-toggle="button">Executar</a>
@@ -81,26 +208,31 @@
     </div>
 </form>
 
+<!-- Formulário para entrada do Agrupamento-->
+<form th:action="@{'/agrupa/campo'}" th:object="${campo}" method="POST" class="bottom-5" id="cartao-add-agrupamento"
+      style="display: none">
 
-<form th:action="@{'/agrupa/campo'}" th:object="${campo}" method="POST">
-    <div class="container justify-content-center mt-5">
+
+    <div class="container ">
         <div class="card">
-            <div class="card-body">
+            <div class="card-content">
                 <div th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO') }">
 
-                    <h3 class="card-title">Campos Agrupar Dados</h3>
+                    <div class="row">
+                        <span class="card-title">Campos usados para Agrupar os Dados</span>
+                    </div>
 
                     <input type=hidden th:field="*{idAgrupa}">
                     <input type=hidden th:field="*{idCampo}">
 
-                    <div class="row mt-5">
-                        <div class="col">
-                            <label class="form-check-label">Selecione o campo para agrupamento</label>
+
+                    <div class="row">
+                        <div class="col s12">
+                            <label class="form-check-label">Selecione Campo para agrupamento:</label>
                         </div>
                     </div>
-                    <div class="row mt-2">
-                        <div class="col">
-
+                    <div class="row">
+                        <div class="col s12">
                             <select class="form-control form-control-lg" th:field="*{nomeCampo}">
                                 <option th:each="nomeCampoCombo, state : ${campos}"
                                         th:value="${state.index}+';'+${nomeCampoCombo}"
@@ -110,48 +242,75 @@
                     </div>
                 </div>
 
-                <div class="row mt-5">
-                    <div class="col">
+                <div class="row">
+                    <div class="col s12">
                         <button type="submit" class="btn btn-info w-100">Incluir</button>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</form>
 
-            <hr class="hr"/>
-            <h3 class="h3 ml-3 mb-3">
-                Lista de Campos
-            </h3>
+<form class="button-5" id="cartao-list-agrupamento" style="display: none">
 
-            <div class="row mt-5 mr-1 ml-1">
-                <div class="col">
-                    <table id="dataTable" class="display">
-                        <thead>
-                        <tr>
-                            <td>#</td>
-                            <td>Nome</td>
-                            <td th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO')}">Ações</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="campoItem : ${ agrupa.getCamposOrdenados() }">
-                            <td th:text="${campoItem.id}"/>
-                            <td th:text="${campoItem.numeroColuna} + ' - ' + ${campoItem.nomeColuna}"/>
-                            <td th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO')}">
-                                <a th:href="@{'/agrupa/' + ${agrupa.id} + '/campo/' + ${campoItem.id} + '/deletar'}"
-                                   class="btn btn-danger">
-                                    <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
-                                </a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+    <div class="container">
+        <div class="card">
+
+            <div class="card-content">
+
+                <div class="row">
+                    <span class="col s12 card-title">Lista de Agrupamentos</span>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        <table id="dataTable" class="display">
+                            <thead>
+                            <tr>
+                                <td>#</td>
+                                <td>Nome</td>
+                                <td th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO')}">Ações</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="campoItem : ${ agrupa.getCamposOrdenados() }">
+                                <td th:text="${campoItem.id}"/>
+                                <td th:text="${campoItem.numeroColuna} + ' - ' + ${campoItem.nomeColuna}"/>
+                                <td th:if="${#strings.equals(agrupa.estado, 'NAO_INICIADO')}">
+                                    <a th:replace="icons :: remover( @{'/agrupa/' + ${agrupa.id} + '/campo/' + ${campoItem.id} + '/deletar'} )"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-        <hr>
-        <a th:href="@{/agrupa}">Lista de Processamento de Agrupamento</a>
     </div>
 </form>
-<div th:replace="~{menu_botton :: menu}"></div>
+<div th:replace="~{menu :: menu_bottom}"/>
+<!-- Include external files -->
+<div th:replace="~{menu :: jss}"/>
+
+<!-- Run JS initialize scripts -->
+<script th:replace="~{icons :: tooltip_js}"/>
+<script th:replace="~{icons :: select_js}"/>
+<div th:replace="~{menu :: menu_js}"/>
+
 </body>
+<script th:replace="~{menu :: toast_js (${mensagem})}"/>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        var tab = /*[[${mostraTab}]]*/;
+
+        if (tab == null)
+            tab = 1;
+
+        ativa(tab);
+        $('.tooltipped').tooltip();
+    });
+</script>
+
 </html>

@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{header :: header ('Agrupar Arquivos :: Lista')}"/>
-<head>
-    <meta http-equiv="refresh" content="30">
-    <script src="/datatable.js"></script>
-</head>
+<head th:replace="~{header :: header ('Listagem de Agrupamentos', 'Lista os agrupamentos e mostra o seu estado atual')}"/>
 
 <body>
-<div th:replace="~{menu :: menu}"></div>
-<div class="container">
+<div th:replace="~{menu :: menu_top}"></div>
+<div class="container-fluid">
 
-    <head th:replace="~{header :: titulo_pagina ('Listagem - Agrupar dados de arquivos por colunas')}"/>
+    <div th:replace="~{header :: titulo_pagina ('Listagem - Agrupar arquivos por colunas')}"/>
 
     <div class="row">
-        <div class="col">
-            <!-- <form action="#" th:action="@{/agrupaVO/}" th:object="${filtroVOS}"> -->
 
+        <div class="col offset-s11 s1 center" style="position: fixed">
+            <a class="btn-floating btn-large waves-effect waves-light red" th:href="@{/agrupa/criar}">
+                <i class="material-icons">add</i>
+            </a>
+        </div>
+
+        <div class="col s12 bottom-5">
             <table id="dataTable" class="display">
                 <thead class="thead-dark">
                 <tr>
@@ -28,7 +29,7 @@
                     <th>Inicio Execução</th>
                     <th>Fim Execução</th>
                     <th>Linhas Processadas</th>
-                    <th colspan="3">Ações</th>
+                    <th colspan="5">Ações</th>
                 </tr>
                 </thead>
                 <tbody class="table-striped">
@@ -43,30 +44,54 @@
                     <td th:text="${#temporals.format(agrupaVO.getDtFim(), 'dd/MM/yyyy hh:mm:ss')}"></td>
                     <td th:text="${#numbers.formatInteger(agrupaVO.getNumeroLinhasProcessadas(),3,'POINT')}"></td>
                     <td>
-                        <a th:href="@{'/agrupa/' + ${agrupaVO.id}}" class="btn btn-primary">
-                            <span class="glyphicon glyphicon glyphicon glyphicon-pencil"/>
-                        </a>
+                        <div th:if="${!agrupaVO.estado.toString().equals('PROCESSANDO')}">
+                            <a th:replace="icons :: editar(@{/agrupa/{id}(id=${agrupaVO.id})})"/>
+                        </div>
                     </td>
                     <td>
-                        <a th:href="@{'/agrupa/' + ${agrupaVO.id} + '/deletar'}" class="btn btn-danger">
-                            <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
-                        </a>
+                        <div th:if="${!agrupaVO.estado.toString().equals('PROCESSANDO')}">
+                            <a th:replace="icons :: copiar(@{/agrupa/{id}/copiar(id=${agrupaVO.id})})"/>
+                        </div>
                     </td>
                     <td>
-                        <a th:href="@{'/agrupa/' + ${agrupaVO.id} +'/executar'}" class="btn btn-dark">
-                            <span class="glyphicon glyphicon glyphicon glyphicon-flash"/>
-                        </a>
+                        <div th:if="${agrupaVO.estado.toString().equals('NAO_INICIADO')}">
+                            <a th:replace="icons :: executar(@{/agrupa/{id}/executar(id=${agrupaVO.id})})"/>
+                        </div>
                     </td>
+                    <td>
+                        <div th:if="${!agrupaVO.estado.toString().equals('PROCESSANDO')}">
+                            <a th:replace="icons :: remover(@{/agrupa/{id}/deletar(id=${agrupaVO.id})})"/>
+                        </div>
+                    </td>
+                    <td>
+                        <div th:if="${agrupaVO.estado.toString().equals('PROCESSANDO') || agrupaVO.estado.toString().equals('TERMINADO') }">
+                            <a th:replace="icons :: analise_nova_janela(${'http://localhost:9966/dashboard/jobs/' + agrupaVO.getJobId()})"/>
+                        </div>
+                    </td>
+
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <!-- </form> -->
-
-    <a th:href="@{/agrupa/novo}">Adicionar Agrupamentos de Arquivos</a>
-
 </div>
-<div th:replace="~{menu_botton :: menu}"></div>
+<div th:replace="~{menu :: menu_bottom}"></div>
+
+<!-- Include external files -->
+<div th:replace="~{menu :: jss}"/>
+
+<!-- Run JS initialize scripts -->
+<script th:replace="~{icons :: tooltip_js}"/>
+<div th:replace="~{menu :: menu_js}"/>
 </body>
+<script th:replace="~{menu :: toast_js (${mensagem})}"/>
+
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        setTimeout(() => {
+            window.location.href = document.location.href.split("?")[0];
+        }, 15000);
+    });
+</script>
 </html>

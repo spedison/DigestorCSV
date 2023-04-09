@@ -22,11 +22,11 @@ public class ListadorDiretoriosEArquivos {
     @Autowired
     ConfiguracaoService configuracaoService;
 
-    private void addInList(File dir, List<File> directories, Long limite) throws IOException {
+    private void addicionaNaLista(File dir, List<File> directories, Long limite) throws IOException {
         try (Stream<Path> stream = Files.walk(Paths.get(dir.toString()), 10)) {
             stream
-                    .limit(limite)
                     .filter(Files::isDirectory)
+                    .limit(limite)
                     .map(Path::toFile)
                     .forEach(directories::add);
         } catch (IOException e) {
@@ -36,21 +36,22 @@ public class ListadorDiretoriosEArquivos {
     }
 
     @Cacheable("diretorios-entrada")
-    public List<File> lerDiretoriosParaEntrada() {
+    public List<File> lerDiretoriosParaEntradaFormatoFile() {
         List<File> ret = new LinkedList<>();
         List<String> diretorios = configuracaoService.getDiretorios();
         IntStream.range(0, diretorios.size()).forEach(i -> {
             try {
-                addInList(new File(diretorios.get(i)), ret, 1_000_000L);
+                addicionaNaLista(new File(diretorios.get(i)), ret, 1_000_000L);
             } catch (IOException ioe) {
+                log.error("Problema ao lista diretório de entrada : " + ioe.getMessage());
             }
         });
         return ret;
     }
 
-    public List<String> lerDiretoriosParaEntradaString() {
+    public List<String> lerDiretoriosParaEntradaFormatoString() {
         return
-                lerDiretoriosParaEntrada()
+                lerDiretoriosParaEntradaFormatoFile()
                         .stream()
                         .map(File::toString)
                         .distinct()
@@ -62,12 +63,12 @@ public class ListadorDiretoriosEArquivos {
         List<File> ret = new LinkedList<>();
         String diretorios = configuracaoService.getDiretorios().get(0);
         try {
-            addInList(new File(diretorios), ret, 1L);
+            addicionaNaLista(new File(diretorios), ret, 1L);
+            if (ret.isEmpty())
+                return null;
+            return ret.get(0);
         } catch (IOException ioe) {
             return null;
         }
-        if (ret.isEmpty())
-            return null;
-        return ret.get(0);
     }
 }

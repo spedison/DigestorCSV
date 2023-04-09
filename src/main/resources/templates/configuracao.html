@@ -13,12 +13,12 @@
     <form action="#" th:action="@{/configuracao}" th:object="${configuracoes}" method="POST">
 
         <div th:each="configuracao, itemStat : ${configuracoes}" class="form-group row">
-            <div class="col s5">
+            <div class="col m12 s12 l5 xl5">
                 <label th:text="${configuracao.textoSite+' :'}" class="col-form-label col-form-label-lg tooltipped"
                        data-toggle="tooltip" data-position="rigth"
                        th:data-tooltip="${configuracao.getTextoTooltipSite()}"/>
             </div>
-            <div class="col-sm-7">
+            <div class="col m12 s12 l7 xl7">
                 <input type=text th:name="${configuracao.nome}" th:value="${configuracao.valor}"
                        class="form-control mb-3 form-control-lg"/>
             </div>

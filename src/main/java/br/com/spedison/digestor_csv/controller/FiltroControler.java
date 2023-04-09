@@ -45,14 +45,14 @@ public class FiltroControler {
      * @return
      */
     @GetMapping("")
-    public String list(Model model, @RequestParam(required = false) String msg) {
+    public String listar(Model model, @RequestParam(required = false) String msg) {
         List<FiltroVO> filtroVOS = filtroService.listar();
         model.addAttribute("filtros", filtroVOS);
         model.addAttribute("mensagem", msg == null ? "" : msg);
         return "filtro_listar";
     }
 
-    @GetMapping("/novo")
+    @GetMapping("/criar")
     public String adicionar(Model model) {
         File primeiroDirEntrada = listadorDiretoriosEArquivos.lerPrimeiroDiretorioParaEntrada();
 
@@ -65,8 +65,7 @@ public class FiltroControler {
             return "erro_mensagem";
         }
 
-        String diretoriosEntrada = primeiroDirEntrada.toString();
-        FiltroVO novo = filtroService.criaNovoFiltro(diretoriosEntrada);
+        FiltroVO novo = filtroService.criaNovoFiltro(primeiroDirEntrada.toString());
         return "redirect:/filtro/" + novo.getId() + "?msg="
                 + URLEncoder.encode("Novo filtro criado com o id " + novo.getId(), StandardCharsets.UTF_8);
     }
@@ -78,14 +77,29 @@ public class FiltroControler {
      * @return
      */
     @PostMapping("")
-    public String gravaFiltro(FiltroVO filtroVO) {
+    public String gravar(FiltroVO filtroVO) {
         FiltroVO f = filtroService.gravaDadosDoFiltro(filtroVO);
         return "redirect:/filtro/" + f.getId() + "?msg="
                 + URLEncoder.encode("Gravação realizada com sucesso", StandardCharsets.UTF_8);
     }
 
+    @PostMapping(value = "/criterio")
+    public String adicionaCriterio(FiltroCriterioDTO filtroCriterioDTO) {
+        FiltroVO filtroVO = new FiltroVO();
+        filtroVO.setId(filtroCriterioDTO.getIdFiltro());
+        FiltroCriterioVO filtroCriterioVO = new FiltroCriterioVO();
+        filtroCriterioDTO.preencheVO(filtroCriterioVO);
+        filtroCriterioVO.setFiltroVO(filtroVO);
+        FiltroCriterioVO fcvo = filtroService.adicionaCriterio(filtroCriterioVO);
+        return "redirect:/filtro/" + filtroVO.getId() + "?msg="
+                + URLEncoder.encode(
+                "Critério #" + fcvo.getId() + " foi adicionado com sucesso.", StandardCharsets.UTF_8)
+                + "&tab=2";
+    }
+
+
     @GetMapping("/{id}")
-    public String show(
+    public String exibir(
             @PathVariable(value = "id") long id,
             @RequestParam(required = false) String msg,
             @RequestParam(required = false) Integer tab,
@@ -113,7 +127,7 @@ public class FiltroControler {
             model.addAttribute("criterios", criterios);
             model.addAttribute("mostraTab", mostraTab);
 
-            List<String> direatoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaString();
+            List<String> direatoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaFormatoString();
             model.addAttribute("diretoriosEntrada", direatoriosEntrada);
             model.addAttribute("colunasArquivo", colunasArquivo);
             model.addAttribute("mensagem", mensagem);
@@ -129,10 +143,18 @@ public class FiltroControler {
         }
     }
 
+    @GetMapping("/{id}/deletar")
+    public String remover(@PathVariable long id) {
+        filtroService.removeFiltro(id);
+        return "redirect:/filtro?msg="
+                + URLEncoder.encode("O filtro #" + id + " foi removido.", StandardCharsets.UTF_8)
+                + "&tab=3";
+    }
+
     @GetMapping("/{idFiltro}/criterio/{idCriterio}/deletar")
-    public String show(@PathVariable long idFiltro,
-                       @PathVariable long idCriterio,
-                       Model model) {
+    public String removerCriterio(@PathVariable long idFiltro,
+                                  @PathVariable long idCriterio,
+                                  Model model) {
         filtroService.removeCriterio(idFiltro, idCriterio);
         return "redirect:/filtro/" + idFiltro + "?msg="
                 + URLEncoder.encode("Critério #" + idCriterio + " removido com sucesso", StandardCharsets.UTF_8)
@@ -140,8 +162,8 @@ public class FiltroControler {
     }
 
     @GetMapping("/{idFiltro}/copiar")
-    public String show(@PathVariable long idFiltro,
-                       Model model) {
+    public String copiar(@PathVariable long idFiltro,
+                         Model model) {
 
         FiltroVO v = filtroService.copiar(idFiltro);
 
@@ -151,7 +173,7 @@ public class FiltroControler {
                     + "&tab=1";
         } else {
             model.addAttribute("mensagem_linha1", "Não exite o filtro " + idFiltro);
-            model.addAttribute("mensagem_linha2", "Retorne para a listagem de filtros para refazer o processo " );
+            model.addAttribute("mensagem_linha2", "Retorne para a listagem de filtros para refazer o processo ");
             model.addAttribute("link", "/");
             model.addAttribute("nome_link", "Listagem de Filtros");
             return "erro_mensagem";
@@ -166,25 +188,4 @@ public class FiltroControler {
                 + URLEncoder.encode("Filtro #" + id + " será executado em instantes.", StandardCharsets.UTF_8);
     }
 
-    @GetMapping("/{id}/deletar")
-    public String deletarFiltro(@PathVariable(value = "id") long id, Model model) {
-        filtroService.removeFiltro(id);
-        return "redirect:/filtro?msg="
-                + URLEncoder.encode("O filtro #" + id + " foi removido.", StandardCharsets.UTF_8)
-                + "&tab=3";
-    }
-
-    @PostMapping(value = "/criterio")
-    public String adicionaCriterio(FiltroCriterioDTO filtroCriterioDTO) {
-        FiltroVO filtroVO = new FiltroVO();
-        filtroVO.setId(filtroCriterioDTO.getIdFiltro());
-        FiltroCriterioVO filtroCriterioVO = new FiltroCriterioVO();
-        filtroCriterioDTO.preencheVO(filtroCriterioVO);
-        filtroCriterioVO.setFiltroVO(filtroVO);
-        FiltroCriterioVO fcvo = filtroService.adicionaCriterio(filtroCriterioVO);
-        return "redirect:/filtro/" + filtroVO.getId() + "?msg="
-                + URLEncoder.encode(
-                "Critério #" + fcvo.getId() + " foi adicionado com sucesso.", StandardCharsets.UTF_8)
-                + "&tab=2";
-    }
 }

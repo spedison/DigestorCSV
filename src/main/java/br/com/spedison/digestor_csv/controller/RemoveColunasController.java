@@ -1,6 +1,5 @@
 package br.com.spedison.digestor_csv.controller;
 
-import br.com.spedison.digestor_csv.dto.AgrupaCampoDTO;
 import br.com.spedison.digestor_csv.dto.RemoveColunasCampoDTO;
 import br.com.spedison.digestor_csv.infra.ListadorColunasArquivo;
 import br.com.spedison.digestor_csv.infra.ListadorDiretoriosEArquivos;
@@ -42,7 +41,7 @@ public class RemoveColunasController {
     @GetMapping("/{id}")
     public String lista(@PathVariable Long id, Model model) {
         RemoveColunasVO removeColunas = removeColunasService.getAgrupaSemCampos(id);
-        List<String> diretoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaString();
+        List<String> diretoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaFormatoString();
         List<String> campos = listadorColunasArquivo.getListaColunasRemoveColunas(id);
         model.addAttribute("removeColunas", removeColunas);
         model.addAttribute("diretoriosEntrada", diretoriosEntrada);
@@ -53,9 +52,9 @@ public class RemoveColunasController {
         return "remove_colunas_adicionar";
     }
 
-    @GetMapping("/novo")
+    @GetMapping("/criar")
     public String adicionar(Model model) {
-        List<String> diretoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaString();
+        List<String> diretoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaFormatoString();
         RemoveColunasVO novo = removeColunasService.criaNovo(diretoriosEntrada.get(0));
         return "redirect:/remove_colunas/" + novo.getId();
     }

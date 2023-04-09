@@ -1,10 +1,8 @@
 package br.com.spedison.digestor_csv.controller;
 
-import br.com.spedison.digestor_csv.dto.RemoveColunasCampoDTO;
 import br.com.spedison.digestor_csv.dto.ResumoColunasCampoDTO;
 import br.com.spedison.digestor_csv.infra.ListadorColunasArquivo;
 import br.com.spedison.digestor_csv.infra.ListadorDiretoriosEArquivos;
-import br.com.spedison.digestor_csv.model.RemoveColunasCampoVO;
 import br.com.spedison.digestor_csv.model.ResumoColunasCampoVO;
 import br.com.spedison.digestor_csv.model.ResumoColunasVO;
 import br.com.spedison.digestor_csv.processadores.service.ProcessadorJobResumoColunasService;
@@ -43,7 +41,7 @@ public class ResumoColunasController {
     @GetMapping("/{id}")
     public String lista(@PathVariable Long id, Model model) {
         ResumoColunasVO resumoColunas = resumoColunasService.getResumoSemCampos(id);
-        List<String> diretoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaString();
+        List<String> diretoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaFormatoString();
         List<String> campos = listadorColunasArquivo.getListaColunasRemoveColunas(id);
         model.addAttribute("resumoColunas", resumoColunas);
         model.addAttribute("diretoriosEntrada", diretoriosEntrada);
@@ -54,9 +52,9 @@ public class ResumoColunasController {
         return "resumo_colunas_adicionar";
     }
 
-    @GetMapping("/novo")
+    @GetMapping("/criar")
     public String adicionar(Model model) {
-        List<String> diretoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaString();
+        List<String> diretoriosEntrada = listadorDiretoriosEArquivos.lerDiretoriosParaEntradaFormatoString();
         ResumoColunasVO novo = resumoColunasService.criaNovo(diretoriosEntrada.get(0));
         return "redirect:/resumo_colunas/" + novo.getId();
     }

@@ -256,7 +256,7 @@
 
                 <div class="row">
                     <div class="col s12">
-                        <label>Selecione Coluna para Comparação:</label>
+                        <label>Selecione Campo para Comparação:</label>
                     </div>
                     <div class="col s12">
                         <select th:field="*{nomeColuna}" class="form-control">
@@ -281,7 +281,6 @@
                         </select>
                     </div>
                 </div>
-
 
                 <div id="texto" class="row" style="display: none">
                     <!-- Inicia comparação com texto -->
@@ -356,21 +355,19 @@
                                 <td th:text="${criterio.id}"/>
                                 <td th:text="${criterio.getComparacao()}"/>
                                 <td th:if="${#strings.equals(filtro.estado, 'NAO_INICIADO')}">
-                                    <a th:replace="icons ::remover( @{'/filtro/' + ${filtro.id} + '/criterio/' + ${criterio.id} + '/deletar'} )"/>
+                                    <a th:replace="icons :: remover( @{'/filtro/' + ${filtro.id} + '/criterio/' + ${criterio.id} + '/deletar'} )"/>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
-                    <hr>
                 </div>
             </div>
-            <!-- FIM CARD BODY -->
         </div>
     </div>
 </form>
-
-<footer th:replace="~{menu :: menu_bottom}"/>
+<!-- FIM CARD BODY -->
+<div th:replace="~{menu :: menu_bottom}"/>
 
 <!-- Include external files -->
 <div th:replace="~{menu :: jss}"/>
@@ -381,16 +378,13 @@
 <div th:replace="~{menu :: menu_js}"/>
 </body>
 
-<script th:if="${!mensagem.isEmpty()}" th:inline="javascript">
-    $(document).ready(function () {
-        var msg = /*[[${mensagem}]]*/;
-        M.toast({html: msg});
-    });
-</script>
+<script th:replace="~{menu :: toast_js (${mensagem})}"/>
 
 <script th:inline="javascript">
     $(document).ready(function () {
         var tab = /*[[${mostraTab}]]*/;
+        if (tab == null)
+            tab = 1;
         ativa(tab);
         $('.tooltipped').tooltip();
     });

@@ -73,3 +73,13 @@
     <script th:src="@{/materialize/materialize.js}"></script>
     <!--<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>-->
 </head>
+
+
+<script th:inline="javascript" th:fragment="toast_js(mensagem)">
+    $(document).ready(function () {
+        var msg = /*[[${mensagem}]]*/;
+
+        if (msg != "")
+            M.toast({html: msg});
+    });
+</script>

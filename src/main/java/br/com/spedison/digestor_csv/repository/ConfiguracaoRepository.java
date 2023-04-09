@@ -12,18 +12,18 @@ import java.util.List;
 
 @Repository
 public interface ConfiguracaoRepository extends JpaRepository<ConfiguracaoVO, String> {
-    @Cacheable("valoresOrdenado")
+    @Cacheable("valoresOrdenados")
     List<ConfiguracaoVO> findAllByHabilitadoOrderByOrdem(Boolean habilidado);
 
-    @Query(value = "select count(c) from ConfiguracaoVO c where c.habilitado = true", nativeQuery = false)
+    @Query(value = "select count(c) from ConfiguracaoVO c where c.habilitado = true")
     Long contaHabilitados();
 
     @Modifying
-    @Query(value = "UPDATE ConfiguracaoVO c SET c.valor = :valor WHERE c.nome = :nome", nativeQuery = false)
-    @CacheEvict(cacheNames={"valores","valoresOrdenados"})
+    @Query(value = "UPDATE ConfiguracaoVO c SET c.valor = :valor WHERE c.nome = :nome and c.habilitado = true")
+    @CacheEvict(cacheNames = {"valores", "valoresOrdenados"}, allEntries = true, beforeInvocation = true)
     void updateValor(String nome, String valor);
 
     @Query("select c.valor from ConfiguracaoVO c where c.habilitado = true and c.nome in :nomes")
     @Cacheable("valores")
-    List<String> getValores(String ... nomes);
+    List<String> getValores(String... nomes);
 }
