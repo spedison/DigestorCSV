@@ -4,6 +4,9 @@ import org.apache.tika.Tika;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class FileUtils {
 
@@ -39,6 +42,29 @@ public class FileUtils {
             mimetype += (" - " + getEncodingArquivoTexto(nomeDoArquivo));
         }
         return mimetype;
+    }
+
+//    static class HistogramaLinha{
+//        int linha;
+//        int [] contagem;
+//
+//        public HistogramaLinha() {
+//            linha = 0;
+//            contagem = new int[Math.pow(2,16)];
+//        }
+//    }
+
+    public static String getSeparadores(String nomeArquivo, Charset encoding) {
+
+        try (FileReader fr = new FileReader(nomeArquivo)) {
+            BufferedReader br = new BufferedReader(fr);
+
+            return "";
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String getEncodingArquivoTexto(String nomeDoArquivo) {
@@ -133,9 +159,29 @@ public class FileUtils {
     public static String[] separaNomeExtensaoArquivo(String nome) {
         final int posPonto = nome.lastIndexOf('.');
         final String ext = (posPonto > 0 && posPonto < nome.length() - 1) ? nome.substring(posPonto + 1) : "";
-        if (posPonto >= 0 ) {
+        if (posPonto >= 0) {
             nome = nome.substring(0, posPonto);
         }
         return new String[]{nome, ext};
+    }
+
+    public static FilenameFilter getFiltroArquivo(String ext) {
+        return (File dirBase, String nome) -> {
+            File ff = new File(dirBase.toString(), nome);
+            if (ff.exists() && ff.isFile()) {
+                return (
+                        nome.trim().toLowerCase().endsWith(ext.toLowerCase().trim())
+                                || ext.trim().equals("*")
+                                || ext.trim().equals("*.*")
+                );
+            }
+            return false;
+        };
+    }
+
+    public static FilenameFilter getFiltroArquivoNaoVazio(String ext) {
+        return (File dirBase, String nome) ->
+             getFiltroArquivo(ext).accept(dirBase, nome) &&
+                    (Paths.get(dirBase.toString(), nome).toFile().length() > 0) ;
     }
 }

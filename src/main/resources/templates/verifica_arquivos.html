@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{header :: header ('Listagem de Arquivos', 'Lista dados de arquivo')}"/>
+
+<body>
+
+<div th:replace="~{menu :: menu_top}"/>
+
+<div style="margin-bottom: 50px; padding-left: 0px">
+
+    <div th:replace="~{header :: titulo_pagina ('Dados dos arquivos')}"/>
+
+    <div>
+        <form class="container" method="POST" th:action="@{/verificaarquivos}">
+            <div class="row">
+                <div class="col s12">
+                    <label>Selecione o diretório: </label>
+                </div>
+                <div class="col s12">
+                    <select id="diretorio" name="diretorio">
+                        <option th:each="dirEntrada : ${diretorios}" th:value="${dirEntrada}"
+                                th:text="${dirEntrada}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s3">
+                    <label>Selecione a quantidade de arquivos: </label>
+                </div>
+
+                <div class="col s5">
+                    <select id="quantidadeArquivos" name="quantidadeArquivos" class="w-100">
+                        <option value="1">1 Arquivo</option>
+                        <option value="10" selected>10 Arquivo</option>
+                        <option value="100">100 Arquivo</option>
+                        <option value="300">300 Arquivo</option>
+                    </select>
+                </div>
+                <div class="col s4">
+                    <button type="submit" class="btn w-100">Processar</button>
+                </div>
+            </div>
+            <div class="row" th:if="${listaArquivos.size()>0}" style="margin-top: 30px">
+                <div class="col s3">
+                    <p>Diretório Processado:</p>
+                </div>
+                <div class="col s9">
+                    <p th:text="${listaArquivos.get(0).getDiretorio()}"/>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div style="margin-bottom: 100px">
+        <div class="row w-95"
+             style="margin-bottom: 5px; padding-bottom: 0px; border-top: thin solid black; border-top-width:2px; border-bottom: thin solid black; border-bottom-width:2px;">
+            <div class="col s12 m6 l6 xl6 grey lighten-2 naoquebralinha"><h6>Nome Arquivo</h6></div>
+            <div class="col s6 m1 l1 xl1 grey lighten-2"><h6>Extensão</h6></div>
+            <div class="col s6 m1 l1 xl1 grey lighten-2"><h6>Tamanho</h6></div>
+            <div class="col s4 m1 l1 xl1 grey lighten-2"><h6>Encode</h6></div>
+            <div class="col s4 m2 l2 xl2 grey lighten-2 naoquebralinha"><h6>Data Criação</h6></div>
+            <div class="col s4 m1 l1 xl1 grey lighten-2 naoquebralinha"><h6>Separadores</h6></div>
+        </div>
+
+        <div class="row w-95" th:if="${listaArquivos.empty}"
+             style="border-top: thin solid black; border-bottom: thin solid black">
+            <div class="col s12 m12 l12 xl12">Diretório sem arquivos para avaliar</div>
+        </div>
+
+        <div class="row w-95" th:each="arquivo : ${listaArquivos}" style="border-top: thin solid black">
+            <div class="col s12  m6 l6 xl6 blue lighten-5 naoquebralinha" th:text="${arquivo.getNome()}"/>
+            <div class="col s6  m1 l1 xl1 blue lighten-5 naoquebralinha" th:text="${arquivo.getExtensao()}"/>
+            <div class="col s6  m1 l1 xl1 blue lighten-5 naoquebralinha" th:text="${arquivo.getTamanho()}"/>
+            <div class="col s4  m1 l1 xl1 blue lighten-5 naoquebralinha" th:text="${arquivo.getEncoding()}"/>
+            <div class="col s4  m2 l2 xl2 blue lighten-5 naoquebralinha"
+                 th:text="${#temporals.format(arquivo.getDataCriacao(), 'dd/MM/yyyy hh:mm:ss')}"/>
+            <div class="col s4  m1 l1 xl1  blue lighten-5 naoquebralinha"
+                 th:text="${arquivo.getPossiveisSeparadores()}"/>
+            <div class="col s12 m12 l12 xl12 naoquebralinha"><h6>Trecho do arquivo :</h6></div>
+            <div class="col s12 m12 l12 xl12 "
+                 style="margin-bottom: 30px; width: 1500px; word-wrap: break-word; font-family: 'Courier New'"
+                 th:utext="${arquivo.getPrimeirasLinhasJuntas}"></div>
+        </div>
+    </div>
+</div>
+<script th:replace="~{menu :: menu_bottom}"/>
+<!-- Include external files -->
+<script th:replace="~{menu :: jss}"/>
+<!-- Run JS initialize scripts -->
+<script th:replace="~{icons :: tooltip_js}"/>
+<script th:replace="~{icons :: select_js}"/>
+<script th:replace="~{menu :: menu_js}"/>
+
+</body>
+
+<script th:replace="~{menu :: toast_js (${mensagem})}"/>
+
+</html>

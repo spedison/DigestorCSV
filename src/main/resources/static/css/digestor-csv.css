@@ -16,6 +16,14 @@ footer {
     width: 100%;
 }
 
+.w-75{
+    width: 75%;
+}
+
+.w-95{
+    width: 95%;
+}
+
 .bottom-1{
     margin-bottom: 1em;
 }
@@ -98,4 +106,9 @@ a .tooltip_link .tooltiptext_link {
 /* Show the tooltip text when you mouse over the tooltip container */
 .tooltip_link:hover .tooltiptext_link {
     visibility: visible;
+}
+
+.naoquebralinha {
+    display: inline-block;
+    white-space:nowrap;
 }

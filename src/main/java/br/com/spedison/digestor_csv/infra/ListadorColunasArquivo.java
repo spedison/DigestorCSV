@@ -14,9 +14,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,7 +42,7 @@ public class ListadorColunasArquivo {
         if (Objects.isNull(header) || header.isBlank())
             return null;
 
-        String separador = configuracaoService.getSeparador();
+        String separador = StringUtils.strParaExpressaoRegular(configuracaoService.getSeparador());
         return Arrays.stream(header.split(separador)).toList();
     }
 
@@ -65,45 +68,86 @@ public class ListadorColunasArquivo {
 
     @Cacheable("colunas-arquivos-dir")
     public List<String> getListColunas(String dirEntrada) {
-        String separador = configuracaoService.getSeparador();
+        String separador = StringUtils.strParaExpressaoRegular(configuracaoService.getSeparador());
         String extensao = configuracaoService.getExtensao();
         Charset encode = configuracaoService.getEnconding();
-        String linhaPrimeiroArquivo = lePrimeiraLinhaArquivo(dirEntrada, extensao, encode);
+        String linhaPrimeiroArquivo = lePrimeiraLinhaArquivo(dirEntrada, extensao, encode, false);
+
+        if (Objects.isNull(linhaPrimeiroArquivo))
+            return new LinkedList<>();
 
         return Arrays
                 .stream(
                         linhaPrimeiroArquivo
                                 .split(separador))
-                .map(s -> s.replace("\"", ""))
+                .map(s -> {
+                    s = s.trim();
+                    if (s.charAt(0) == '"')
+                        s = s.substring(1);
+                    if (s.charAt(s.length() - 1) == '"')
+                        s = s.substring(0, s.length() - 1);
+                    return s;
+                })
                 .toList();
     }
 
-    private String lePrimeiraLinhaArquivo(String dir, String ext, Charset encode) {
+    /***
+     *
+     * @param dir Diretório que será analisado
+     * @param ext Extensão de arquivo aceita
+     * @param encode Encoding usado
+     * @param linhas Número de linhas lidas.
+     * @param ignoraLinhasVazias Se true, não aceita linhas vazias como retorno, se false todas as linhas deverão se preenchidas
+     * @return Linhas lidas do 1o arquivo do diretório indicado por dir.
+     */
+    private String[] lePrimeirasLinhasDoArquivo(String dir, String ext, Charset encode, int linhas, boolean ignoraLinhasVazias) {
         File dirToList = new File(dir);
-        File[] lista =
-                dirToList.listFiles((dirBase, nome) -> {
-                    File ff = new File(dirBase.toString(), nome);
-                    if (ff.exists() && ff.isFile()) {
-                        return (
-                                nome.trim().toLowerCase().endsWith(ext.toLowerCase().trim())
-                                        || ext.trim().equals("*")
-                                        || ext.trim().equals("*.*")
-                        );
+        FilenameFilter fnf = FileUtils.getFiltroArquivoNaoVazio(ext);
+
+        final boolean[] achou = {false};
+        FilenameFilter fnfSomenteUm = (d, n) -> {
+            if (achou[0] == true) {
+                return false;
+            }
+            if (fnf.accept(d, n) == false) {
+                return false;
+            } else {
+                achou[0] = true;
+                return true;
+            }
+        };
+
+        File[] lista = dirToList.listFiles(fnfSomenteUm);
+
+        if (lista == null || lista.length == 0)
+            return null;
+
+        var ret = new LinkedList<String>();
+        try (BufferedReader br = FileUtils.abreArquivoLeitura(lista[0].toString(), encode)) {
+            for (int k = 0; k < linhas; k++) {
+                String s = br.readLine();
+                if (s == null)
+                    break;
+                if (!ignoraLinhasVazias) {
+                    if (s.isBlank()) {
+                        continue;
                     }
-                    return false;
-                });
-
-        if (lista.length == 0)
-            return "";
-
-        try {
-            BufferedReader br = FileUtils.abreArquivoLeitura(lista[0].toString(), encode);
-            String ret = br.readLine();
-            br.close();
-            return ret;
+                }
+                ret.add(s);
+            }
         } catch (IOException e) {
             log.error(e);
-            return "";
+            return null;
         }
+        return ret.toArray(String[]::new);
+    }
+
+    private String lePrimeiraLinhaArquivo(String dir, String ext, Charset encode, boolean ignoraLinhasVazias) {
+        String[] linhas = lePrimeirasLinhasDoArquivo(dir, ext, encode, 1, ignoraLinhasVazias);
+        if (Objects.isNull(linhas))
+            return null;
+        if (linhas.length == 0)
+            return null;
+        return linhas[0];
     }
 }

@@ -367,15 +367,15 @@
     </div>
 </form>
 <!-- FIM CARD BODY -->
-<div th:replace="~{menu :: menu_bottom}"/>
+<script th:replace="~{menu :: menu_bottom}"/>
 
 <!-- Include external files -->
-<div th:replace="~{menu :: jss}"/>
+<script th:replace="~{menu :: jss}"/>
 
 <!-- Run JS initialize scripts -->
 <script th:replace="~{icons :: tooltip_js}"/>
 <script th:replace="~{icons :: select_js}"/>
-<div th:replace="~{menu :: menu_js}"/>
+<script th:replace="~{menu :: menu_js}"/>
 </body>
 
 <script th:replace="~{menu :: toast_js (${mensagem})}"/>
