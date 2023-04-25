@@ -3,10 +3,8 @@ package br.com.spedison.digestor_csv.infra;
 import br.com.spedison.digestor_csv.model.AgrupaVO;
 import br.com.spedison.digestor_csv.model.FiltroVO;
 import br.com.spedison.digestor_csv.model.RemoveColunasVO;
-import br.com.spedison.digestor_csv.service.AgrupaService;
-import br.com.spedison.digestor_csv.service.ConfiguracaoService;
-import br.com.spedison.digestor_csv.service.FiltroService;
-import br.com.spedison.digestor_csv.service.RemoveColunasService;
+import br.com.spedison.digestor_csv.model.ResumoColunasVO;
+import br.com.spedison.digestor_csv.service.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,6 +35,9 @@ public class ListadorColunasArquivo {
 
     @Autowired
     RemoveColunasService removeColunasService;
+
+    @Autowired
+    ResumoColunasService resumoColunasService;
 
     private List<String> getColunasObjeto(String header) {
         if (Objects.isNull(header) || header.isBlank())
@@ -106,10 +107,10 @@ public class ListadorColunasArquivo {
 
         final boolean[] achou = {false};
         FilenameFilter fnfSomenteUm = (d, n) -> {
-            if (achou[0] == true) {
+            if (achou[0]) {
                 return false;
             }
-            if (fnf.accept(d, n) == false) {
+            if (!fnf.accept(d, n)) {
                 return false;
             } else {
                 achou[0] = true;
@@ -149,5 +150,10 @@ public class ListadorColunasArquivo {
         if (linhas.length == 0)
             return null;
         return linhas[0];
+    }
+
+    public List<String> getListaColunasResumoColunas(Long id) {
+        ResumoColunasVO resumo = resumoColunasService.getResumoSemCampos(id);
+        return getListColunas(resumo.getDiretorioEntrada());
     }
 }

@@ -3,15 +3,30 @@
 
 <div class="navbar-fixed" th:fragment="menu_top">
     <ul id="dropdown_verificacao" class="dropdown-content">
-        <li class="red accent-1 "><a class="white-text" href="#" th:href="@{/verificaarquivos}">Checar Diretórios e exibe Cabeçalhos</a></li>
+        <li class="red accent-1 "><a class="white-text" href="#" th:href="@{/verificaarquivos}">Checar Diretórios e
+            exibe Cabeçalhos</a></li>
     </ul>
 
     <ul id="dropdown_processamento" class="dropdown-content">
-        <li class="red accent-1  "><a class="white-text" href="#" th:href="@{/filtro}">Filtrar Arquivos</a></li>
-        <li class="red accent-1 "><a class="white-text" href="#" th:href="@{/agrupa}">Agrupar Arquivos Por Colunas</a>
+        <li class="red accent-1  ">
+            <a class="white-text" href="#" th:href="@{/filtro}">
+                Filtrar Arquivos
+            </a>
         </li>
-        <li class="red accent-1 "><a class="white-text" href="#" th:href="@{/remove_colunas}">Remover Colunas dos
-            Arquivos</a></li>
+        <li class="red accent-1 ">
+            <a class="white-text" href="#" th:href="@{/agrupa}">
+                Agrupar Arquivos Por Colunas
+            </a>
+        </li>
+        <li class="red accent-1 ">
+            <a class="white-text" href="#" th:href="@{/resumo}">
+                Resumo Estatístico Por Colunas
+            </a>
+        </li>
+        <li class="red accent-1 ">
+            <a class="white-text" href="#" th:href="@{/remove}">
+                Remover Colunas dos Arquivos
+            </a></li>
     </ul>
 
     <nav>

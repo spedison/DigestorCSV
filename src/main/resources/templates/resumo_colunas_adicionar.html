@@ -1,66 +1,189 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{header :: header ('Resumir dados por colunas :: Adicionar/Editar')}"/>
-<head>
-    <script src="/datatable.js"></script>
-</head>
+<head th:replace="~{header :: header ('Resumir dados por colunas','Cadastro de Resumo')}"/>
 
 <body>
-<div th:replace="~{menu :: menu}"></div>
+<div th:replace="~{menu :: menu_top}"></div>
 
-<form action="#" th:action="@{/resumo_colunas}" th:object="${resumoColunas}" method="POST">
-    <div class="container justify-content-center">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">Adicionar/Alterar - Resumo Estatísitico Agrupado por Colunas</h3>
-                <hr class="hr"/>
-                <input type=hidden th:field="*{id}">
+<script>
+    function ativa(aba) {
+        var tabPanel1 = document.getElementById("cartao-dados");
+        var tabPanel2 = document.getElementById("cartao-add-condicao");
+        var tabPanel3 = document.getElementById("cartao-list-condicao");
+        if (tabPanel2 == null)
+            tabPanel2 = tabPanel3;
 
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <label class="form-label" for="diretorioEntrada">Selecione Diretório de entrada:</label>
+        var tab1 = document.getElementById("tab-1");
+        var tab2 = document.getElementById("tab-2");
+        var tab3 = document.getElementById("tab-3");
+        if (tab2 == null)
+            tab2 = tab3;
+
+        var fundoTab1 = document.getElementById("fundo-tab-1");
+        var fundoTab2 = document.getElementById("fundo-tab-2");
+        var fundoTab3 = document.getElementById("fundo-tab-3");
+        if (fundoTab2 == null)
+            fundoTab2 = fundoTab3;
+
+        switch (aba) {
+            case 1:
+                tabPanel1.style.display = "block";
+                tabPanel2.style.display = "none";
+                tabPanel3.style.display = "none";
+
+                tab2.classList.remove("active");
+                tab3.classList.remove("active");
+                tab1.classList.add("active");
+
+                fundoTab2.classList.remove("red");
+                fundoTab2.classList.remove("lighten-5");
+                fundoTab3.classList.remove("red");
+                fundoTab3.classList.remove("lighten-5");
+                fundoTab1.classList.add("red");
+                fundoTab1.classList.add("lighten-5");
+
+                break;
+            case 2:
+                tabPanel2.style.display = "block";
+                tabPanel1.style.display = "none";
+                tabPanel3.style.display = "none";
+                tab1.classList.remove("active");
+                tab3.classList.remove("active");
+                tab2.classList.add("active");
+
+                fundoTab1.classList.remove("red");
+                fundoTab1.classList.remove("lighten-5");
+                fundoTab3.classList.remove("red");
+                fundoTab3.classList.remove("lighten-5");
+                fundoTab2.classList.add("red");
+                fundoTab2.classList.add("lighten-5");
+
+                break;
+            case 3:
+                tabPanel3.style.display = "block";
+                tabPanel1.style.display = "none";
+                tabPanel2.style.display = "none";
+                tab1.classList.remove("active");
+                tab2.classList.remove("active");
+                tab3.classList.add("active");
+
+                fundoTab2.classList.remove("red");
+                fundoTab2.classList.remove("lighten-5");
+                fundoTab1.classList.remove("red");
+                fundoTab1.classList.remove("lighten-5");
+
+                fundoTab3.classList.add("red");
+                fundoTab3.classList.add("lighten-5");
+                break;
+        }
+    }
+
+</script>
+
+<head th:replace="~{header :: titulo_pagina ('Adicionar/Alterar - Resumo Estatístico por campo')}"/>
+
+<!-- somente a aba com 3 tabs.-->
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs tabs-fixed-width">
+                <li id="fundo-tab-1" class="  tab col s3 red lighten-5">
+                    <a id="tab-1" class="active" onclick="ativa(1)">
+                        Dados Resumo
+                    </a>
+                </li>
+                <li id="fundo-tab-2" class="  tab col s3" th:if="${#strings.equals(resumoColunas.estado, 'NAO_INICIADO') }">
+                    <a id="tab-2" onclick="ativa(2)">
+                        Adicionar Campos
+                    </a>
+                </li>
+                <li id="fundo-tab-3" class="  tab col s3">
+                    <a id="tab-3" onclick="ativa(3)">
+                        Lista Campos
+                    </a>
+                </li>
+                <li> <!-- Volta para a lista de resumos. -->
+                    <a class="btn btn-floating right waves-effect waves-light red" th:href="@{'/resumo'}">
+                        <i class="material-icons">list</i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<form action="#" th:action="@{/resumo}" th:object="${resumoColunas}" method="POST" class="bottom-5" id="cartao-dados"
+      style="display: none">
+    <input type=hidden th:field="*{id}"/>
+
+    <div class="container">
+        <div class="card" style="display: block">
+            <div class="card-content">
+                <div class="row">
+                    <span class="col s12 card-title">Dados do Resumo Estatístico</span>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        <label for="nomeTarefa">Nome da tarefa:</label>
+                    </div>
+                    <div class="col s12">
+                        <input type=text th:field="*{nomeDaTarefa}"/>
                     </div>
                 </div>
 
-                <div class="row mt-2">
-                    <div class="col">
-                        <select class="form-control form-control-lg" th:field="*{diretorioEntrada}">
+                <div class="row">
+                    <div class="col s12 ">
+                        <label for="diretorioEntrada">Selecione Diretório de entrada:</label>
+                    </div>
+                    <div class="col s12 ">
+                        <select th:field="*{diretorioEntrada}">
                             <option th:each="dirEntrada : ${diretoriosEntrada}" th:value="${dirEntrada}"
                                     th:text="${dirEntrada}"></option>
                         </select>
                     </div>
                 </div>
 
-<!-- Coluna a Ser resumida.-->
+                <div class="row">
+                    <div class="col s12">
+                        <label>Selecione Campo para resumir:</label>
+                    </div>
+                    <div class="col s12">
+                        <select th:field="*{colunaSumarizada}" class="form-control">
+                            <option th:each="coluna, status : ${campos}"
+                                    th:text="${coluna}"
+                                    th:value="${status.index}+';'+${coluna}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
 
-                <div class="row mt-4">
-                    <div class="col">
+
+                <div class="row">
+                    <div class="col s12">
                         <label for="diretorioSaida">Diretório Saída:</label>
                     </div>
-                </div>
-
-                <div class="row mt-2">
-                    <div class="col">
-                        <input type=text readonly th:field="*{diretorioSaida}" class="form-control">
+                    <div class="col s12">
+                        <input disabled type=text class="validate" th:field="*{diretorioSaida}"/>
                     </div>
                 </div>
 
-                <div class="row mt-4">
-                    <div class="col col-6">
+                <div class="row">
+                    <div class="col s12 m6 xl6 l6">
                         <p th:text="*{'Data/Hora Criação : '+ #temporals.format(dataCriacao, 'dd/MM/yyyy HH:mm:ss')}"/>
                     </div>
-                    <div class="col col-6">
-                        <p th:text="${'Estado Atual :' + removeColunas.estado}"/>
+                    <div class="col s12 m6 xl6 l6">
+                        <p th:text="${'Estado Atual :' + resumoColunas.estado.toString()}"/>
                     </div>
                 </div>
 
-                <div class="row mt-5 p-5">
-                    <div class="col-6" th:if="${#strings.equals(removeColunas.estado, 'NAO_INICIADO') }">
+                <div class="row">
+                    <div class="col s12 xl6 l6" th:if="${#strings.equals(resumoColunas.estado.toString(), 'NAO_INICIADO') }">
                         <button type="submit" class="btn btn-info w-100">Gravar</button>
                     </div>
-                    <div class="col-6"
-                         th:if="${removeColunas.getCamposParaRemover.size() > 0 && #strings.equals(removeColunas.estado, 'NAO_INICIADO') }">
-                        <a th:href="@{'/remove_colunas/'+ ${removeColunas.id} + '/executar'}" class="btn btn-info w-100"
+                    <div class="col s12 xl6 l6"
+                         th:if="${listaCamposResumo.size() > 0 && #strings.equals(resumoColunas.estado.toString(), 'NAO_INICIADO') }">
+                        <a th:href="@{'/resumo/'+ ${resumoColunas.id} + '/executar'}" class="btn btn-info w-100"
                            role="button"
                            data-bs-toggle="button">Executar</a>
                     </div>
@@ -71,74 +194,106 @@
 </form>
 
 
-<form th:action="@{'/remove_colunas/campo'}" th:object="${campo}" method="POST">
-    <div class="container justify-content-center mt-5">
+<form th:action="@{'/resumo/campo'}" th:object="${campo}" method="POST" class="bottom-5"
+      id="cartao-add-condicao" style="display: none">
+    <div class="container ">
         <div class="card">
-            <div class="card-body">
-                <div th:if="${#strings.equals(removeColunas.estado, 'NAO_INICIADO') }">
+            <div class="card-content">
 
-                    <h3 class="card-title">Campo para remover</h3>
 
-                    <input type=hidden th:field="*{idRemoveColunas}">
-                    <input type=hidden th:field="*{idCampo}">
-
-                    <div class="row mt-5">
-                        <div class="col">
-                            <label class="form-check-label">Selecione o campo para remover</label>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col">
-
-                            <select class="form-control form-control-lg" th:field="*{nomeCampo}">
-                                <option th:each="nomeCampoCombo, state : ${campos}"
-                                        th:value="${state.index}+';'+${nomeCampoCombo}"
-                                        th:text="${nomeCampoCombo}"></option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="row">
+                    <span class="col s12 card-title">Campos de Resumo</span>
                 </div>
 
-                <div class="row mt-5">
-                    <div class="col">
-                        <button type="submit" class="btn btn-info w-100">Incluir</button>
+                <input type=hidden th:field="*{idResumoColunas}">
+                <input type=hidden th:field="*{idCampo}">
+
+                <div class="row">
+                    <div class="col s12">
+                        <label>Selecione o campo para resumir:</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <select class="form-control form-control-lg" th:field="*{nomeCampo}">
+                            <option th:each="nomeCampoCombo, state : ${campos}"
+                                    th:value="${state.index}+';'+${nomeCampoCombo}"
+                                    th:text="${nomeCampoCombo}"></option>
+                        </select>
                     </div>
                 </div>
             </div>
-            <hr class="hr"/>
-            <h3 class="ml-3">
-                Lista de campos para remover
-            </h3>
 
-            <div class="row mt-3 mr-1 ml-1">
-                <div class="col">
-                    <table id="dataTable" class="display">
-                        <thead>
-                        <tr>
-                            <td>#</td>
-                            <td>Nome</td>
-                            <td th:if="${#strings.equals(removeColunas.estado, 'NAO_INICIADO')}">Ações</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="campoItem : ${removeColunas.camposParaRemover}">
-                            <td th:text="${campoItem.id}"/>
-                            <td th:text="${campoItem.numeroColuna} + ' - ' + ${campoItem.nomeColuna}"/>
-                            <td th:if="${#strings.equals(removeColunas.estado, 'NAO_INICIADO')}">
-                                <a th:href="@{'/remove_colunas/' + ${removeColunas.id} + '/campo/' + ${campoItem.id} + '/deletar'}"
-                                   class="btn btn-danger">
-                                    <span class="glyphicon glyphicon glyphicon glyphicon-remove"/>
-                                </a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+            <div class="row">
+                <div class="col s12">
+                    <button type="submit" class="btn w-100 bottom-5">Incluir</button>
                 </div>
             </div>
         </div>
-        <hr>
-        <a th:href="@{/remove_colunas}">Lista de Processamento de Agrupamento</a>
     </div>
 </form>
+
+<form class="bottom-5"
+      id="cartao-list-condicao" style="display: none">
+
+    <div class="container">
+
+        <div class="card">
+
+            <div class="card-content">
+
+                <div class="row">
+                    <span class="col s12 card-title">Lista de campos para resumir</span>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        <table id="dataTable" class="display">
+                            <thead>
+                            <tr>
+                                <td>#</td>
+                                <td>Nome</td>
+                                <td th:if="${#strings.equals(resumoColunas.estado, 'NAO_INICIADO')}">Ações</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="campoItem : ${listaCamposResumo}">
+                                <td th:text="${campoItem.id}"/>
+                                <td th:text="${campoItem.numeroColuna} + ' - ' + ${campoItem.nomeColuna}"/>
+                                <td th:if="${#strings.equals(resumoColunas.estado, 'NAO_INICIADO')}">
+                                    <a th:replace="icons :: remover( @{'/resumo/' + ${resumoColunas.id} + '/campo/' + ${campoItem.id} + '/deletar'})"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!-- FIM CARD BODY -->
+<script th:replace="~{menu :: menu_bottom}"/>
+
+<!-- Include external files -->
+<script th:replace="~{menu :: jss}"/>
+
+<!-- Run JS initialize scripts -->
+<script th:replace="~{icons :: tooltip_js}"/>
+<script th:replace="~{icons :: select_js}"/>
+<script th:replace="~{menu :: menu_js}"/>
 </body>
+
+<script th:replace="~{menu :: toast_js (${mensagem})}"/>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        var tab = /*[[${mostraTab}]]*/;
+        if (tab == null)
+            tab = 1;
+        ativa(tab);
+        $('.tooltipped').tooltip();
+    });
+</script>
+
 </html>

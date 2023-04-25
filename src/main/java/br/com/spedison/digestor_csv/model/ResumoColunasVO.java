@@ -14,13 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Table(name = "tb_agrupa")
+@Table(name = "tb_resumo")
 public class ResumoColunasVO {
 
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+
+    @Column(nullable = false)
+    private String nomeDaTarefa;
+
     @Column(nullable = false)
     private String diretorioEntrada;
     @Column(nullable = false)
@@ -29,13 +34,15 @@ public class ResumoColunasVO {
     private LocalDateTime dataCriacao;
     @Enumerated(EnumType.STRING)
     private EstadoProcessamentoEnum estado;
+
     @OneToMany(mappedBy = "resumoColunasVO", fetch = FetchType.LAZY)
     private List<ResumoColunasCampoVO> camposParaResumir;
+
     private LocalDateTime dtInicio;
     private LocalDateTime dtFim;
     @Column(nullable = false)
     private Long numeroLinhasProcessadas;
-    private Integer numercoColunaSumarizada;
+    private Integer numeroColunaSumarizada;
     private String nomeColunaSumarizada;
 
     @Column(nullable = true)

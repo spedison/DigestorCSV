@@ -21,12 +21,12 @@ public class ProcessadorJobResumoColunasService {
     private ProcessadorResumoColunas processadorResumoColunas;
 
     @Job
-    public void executaFiltro(Long filtroId, JobContext jobContext) {
-        processadorResumoColunas.executar(filtroId, jobContext);
+    public void executa(Long id, JobContext jobContext) {
+        processadorResumoColunas.executar(id, jobContext);
     }
 
     public void executa(Long id) {
-        jobScheduler.enqueue(() -> this.executaFiltro(id, JobContext.Null));
+        jobScheduler.enqueue(() -> this.executa(id, JobContext.Null));
     }
 
 }

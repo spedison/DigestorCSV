@@ -33,6 +33,15 @@ public interface ResumoColunasRepository extends JpaRepository<ResumoColunasVO, 
     Integer atualizaLinhasProcessadas(Long id, Long linhasProcessadas);
 
     @Modifying
-    @Query("update from ResumoColunasVO a set  a.diretorioEntrada= :nomeDiretorio, a.numeroLinhasProcessadas = :numeroCampo, a.nomeColunaSumarizada = :nomeCampo where a.id = :id")
-    Integer atualizaDiretorioCampoResumo(Long id, String nomeDiretorio, Integer numeroCampo, String nomeCampo);
+    @Query("update from ResumoColunasVO a " +
+            "set  " +
+            "a.nomeDaTarefa = :nomeDaTarefa, " +
+            "a.diretorioEntrada= :nomeDiretorioEntrada, " +
+            "a.diretorioSaida = :nomeDiretorioSaida, " +
+            "a.numeroColunaSumarizada = :numeroColunaSumarizada, " +
+            "a.nomeColunaSumarizada = :nomeColunaSumarizada " +
+            "where a.id = :id")
+    Integer atualizaDiretorioECampoResumo(Long id, String nomeDaTarefa,
+                                          String nomeDiretorioEntrada, String nomeDiretorioSaida,
+                                          Integer numeroColunaSumarizada, String nomeColunaSumarizada);
 }

@@ -27,14 +27,10 @@ public class ProcessadorResumoColunas extends ProcessadorBase {
     @Autowired
     private ResumoColunasService resumeColunasService;
     private ResumoColunasVO resumeColunasVO;
-
     private List<Integer> colunasParaResumir;
-
     @Autowired
     ExecutadorComControleTempo executaAtualizacao;
-
     List<Map<String, List<Double>>> dadosColunaSumarizada = new LinkedList<>();
-
     private void addItemDadosColuna() {
         dadosColunaSumarizada.add(new HashMap<>());
     }
@@ -45,7 +41,6 @@ public class ProcessadorResumoColunas extends ProcessadorBase {
     protected void preInicia(Long idTarefa, JobContext jobContext) {
         resumeColunasVO = resumeColunasService.getResumoComCampos(idTarefa);
     }
-
 
     void processaUmArquivo(FileProcessamento arquivoEntrada) {
 
@@ -88,7 +83,7 @@ public class ProcessadorResumoColunas extends ProcessadorBase {
                 listaUsada
                         .add(
                                 Double.parseDouble(
-                                        colunas[resumeColunasVO.getNumercoColunaSumarizada()].
+                                        colunas[resumeColunasVO.getNumeroColunaSumarizada()].
                                                 replaceAll("[^0-9-E.,]",
                                                         "")));
             }

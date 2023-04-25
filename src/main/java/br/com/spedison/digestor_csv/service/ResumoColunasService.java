@@ -1,6 +1,7 @@
 package br.com.spedison.digestor_csv.service;
 
 import br.com.spedison.digestor_csv.infra.FormatadorData;
+import br.com.spedison.digestor_csv.infra.ResumoColunasVoUtils;
 import br.com.spedison.digestor_csv.model.*;
 import br.com.spedison.digestor_csv.repository.ResumoColunasCampoRepository;
 import br.com.spedison.digestor_csv.repository.ResumoColunasRepository;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,17 +24,23 @@ public class ResumoColunasService {
     @Autowired
     FormatadorData formatadorData;
 
+    @Autowired
+    ResumoColunasVoUtils resumoColunasVoUtils;
+
     public ResumoColunasVO criaNovo(String diretorioEntrada) {
         ResumoColunasVO ret = new ResumoColunasVO();
         String dirSaida = configuracaoService.getConfiguracao(ConfiguracaoVO.nomes[2]);
         List<ResumoColunasCampoVO> campos = new LinkedList<>();
         ret.setId(null);
+        ret.setNomeDaTarefa("Nova Tarefa");
         ret.setEstado(EstadoProcessamentoEnum.NAO_INICIADO);
         ret.setDataCriacao(LocalDateTime.now());
         ret.setDiretorioEntrada(diretorioEntrada);
-        ret.setDiretorioSaida(Paths.get(dirSaida, "agrupa", formatadorData.formataDataParaArquivos(ret.getDataCriacao())).toString());
+        resumoColunasVoUtils.formataDirSaida(ret, dirSaida);
         ret.setCamposParaResumir(campos);
         ret.setNumeroLinhasProcessadas(0L);
+        List<ResumoColunasCampoVO> lst = new LinkedList<>();
+        ret.setCamposParaResumir(lst);
         return resumoRepository.save(ret);
     }
 
@@ -59,17 +65,21 @@ public class ResumoColunasService {
     }
 
     @Transactional
-    public Integer salvaDiretoriosECampoResumo(ResumoColunasVO resumoCamposVO) {
-        return resumoRepository.atualizaDiretorioCampoResumo(
+    public Integer salvaDiretoriosECampoSumarizado(ResumoColunasVO resumoCamposVO) {
+        String dirSaida = configuracaoService.getDirSaida();
+        resumoColunasVoUtils.formataDirSaida(resumoCamposVO, dirSaida);
+        return resumoRepository.atualizaDiretorioECampoResumo(
                 resumoCamposVO.getId(),
+                resumoCamposVO.getNomeDaTarefa(),
                 resumoCamposVO.getDiretorioEntrada(),
-                resumoCamposVO.getNumercoColunaSumarizada(),
+                resumoCamposVO.getDiretorioSaida(),
+                resumoCamposVO.getNumeroColunaSumarizada(),
                 resumoCamposVO.getNomeColunaSumarizada());
     }
 
     @Transactional
-    public ResumoColunasVO registrarInicioProcessamento(Long idAgrupa, String jobId) {
-        ResumoColunasVO f = resumoRepository.buscaPorIdSemCampos(idAgrupa);
+    public ResumoColunasVO registrarInicioProcessamento(Long id, String jobId) {
+        ResumoColunasVO f = resumoRepository.buscaPorIdSemCampos(id);
         if (f == null)
             return null;
         f.setEstado(EstadoProcessamentoEnum.INICIANDO);
@@ -114,7 +124,10 @@ public class ResumoColunasService {
     }
 
     public List<ResumoColunasCampoVO> getCampos(long id) {
-        return resumoCamposRepository.findAllByResumoColunasVO_Id(id);
+        List<ResumoColunasCampoVO> ret = resumoCamposRepository.findAllByResumoColunasVO_Id(id);
+        if (ret == null)
+            ret = new LinkedList<>();
+        return ret;
     }
 
     @Transactional
