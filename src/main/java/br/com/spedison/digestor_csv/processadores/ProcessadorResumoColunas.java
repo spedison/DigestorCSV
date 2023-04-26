@@ -17,6 +17,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Component
@@ -31,6 +32,7 @@ public class ProcessadorResumoColunas extends ProcessadorBase {
     @Autowired
     ExecutadorComControleTempo executaAtualizacao;
     List<Map<String, List<Double>>> dadosColunaSumarizada = new LinkedList<>();
+
     private void addItemDadosColuna() {
         dadosColunaSumarizada.add(new HashMap<>());
     }
@@ -148,7 +150,10 @@ public class ProcessadorResumoColunas extends ProcessadorBase {
     @Override
     void processar() {
 
-        Stream<FileProcessamento> stream = Arrays.stream(super.getArquivosEmProcessamento());
+        dadosColunaSumarizada.clear();
+        IntStream.range(0, getArquivosEmProcessamento().size()).forEach(x -> addItemDadosColuna());
+
+        Stream<FileProcessamento> stream = super.getArquivosEmProcessamento().stream();
 
         resumeColunasService.registrarProcessando(getIdTarefa());
 

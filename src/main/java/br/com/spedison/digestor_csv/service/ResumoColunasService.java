@@ -5,6 +5,7 @@ import br.com.spedison.digestor_csv.infra.ResumoColunasVoUtils;
 import br.com.spedison.digestor_csv.model.*;
 import br.com.spedison.digestor_csv.repository.ResumoColunasCampoRepository;
 import br.com.spedison.digestor_csv.repository.ResumoColunasRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -138,5 +139,33 @@ public class ResumoColunasService {
     @Transactional
     public void removeCampo(long id, long idCampo) {
         resumoCamposRepository.removeByIdAndResumoColunasVO_Id(idCampo, id);
+    }
+
+    public ResumoColunasVO copiar(long id) {
+        ResumoColunasVO v = resumoRepository.buscaPorIdComCampos(id);
+        String dirSaidaConfiguracao = configuracaoService.getDirSaida();
+
+        if (v == null)
+            return null;
+
+        ResumoColunasVO novo = new ResumoColunasVO();
+        BeanUtils.copyProperties(v, novo);
+
+        novo.setNumeroLinhasProcessadas(0L);
+        novo.setCamposParaResumir(new LinkedList<>());
+        v.getCamposParaResumir().forEach(p -> {
+            ResumoColunasCampoVO pp = new ResumoColunasCampoVO();
+            BeanUtils.copyProperties(p,pp);
+            pp.setId(null);
+            pp.setResumoColunasVO(novo);
+            novo.getCamposParaResumir().add(pp);
+        });
+        novo.setEstado(EstadoProcessamentoEnum.NAO_INICIADO);
+        novo.setDataCriacao(LocalDateTime.now());
+        novo.setId(null);
+        resumoColunasVoUtils.formataDirSaida(novo, dirSaidaConfiguracao);
+        resumoRepository.save(novo);
+        resumoCamposRepository.saveAll(novo.getCamposParaResumir());
+        return novo;
     }
 }

@@ -5,6 +5,7 @@ import br.com.spedison.digestor_csv.dto.ResumoColunasDTO;
 import br.com.spedison.digestor_csv.infra.ListadorColunasArquivo;
 import br.com.spedison.digestor_csv.infra.ListadorDiretoriosEArquivos;
 import br.com.spedison.digestor_csv.infra.ResumoColunasVoUtils;
+import br.com.spedison.digestor_csv.model.FiltroVO;
 import br.com.spedison.digestor_csv.model.ResumoColunasCampoVO;
 import br.com.spedison.digestor_csv.model.ResumoColunasVO;
 import br.com.spedison.digestor_csv.processadores.service.ProcessadorJobResumoColunasService;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
@@ -116,4 +119,24 @@ public class ResumoColunasController {
         job.executa(id);
         return "redirect:/resumo/";
     }
+    @GetMapping("/{id}/copiar")
+    public String copiar(@PathVariable long id,
+                         Model model) {
+
+       ResumoColunasVO v = resumoColunasService.copiar(id);
+
+        if (v != null) {
+            return "redirect:/resumo?msg="
+                    + URLEncoder.encode("Resumo de Colunas #" + id + " copiado para o Resumo de Colunas #" + v.getId() + " com sucesso.", StandardCharsets.UTF_8)
+                    + "&tab=1";
+        } else {
+            model.addAttribute("mensagem_linha1", "Não exite o resumo de colunas " + id);
+            model.addAttribute("mensagem_linha2", "Retorne para a listagem de resumo de colunas para refazer o processo ");
+            model.addAttribute("link", "/resumo");
+            model.addAttribute("nome_link", "Listagem de Resumo de Colunas");
+            return "erro_mensagem";
+        }
+
+    }
+
 }

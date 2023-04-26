@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FileProcessamento extends File {
     @Getter

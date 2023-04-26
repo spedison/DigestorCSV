@@ -2,6 +2,7 @@ package br.com.spedison.digestor_csv.processadores;
 
 
 import br.com.spedison.digestor_csv.infra.FileProcessamento;
+import br.com.spedison.digestor_csv.infra.ListFileProcessamento;
 import br.com.spedison.digestor_csv.infra.StringUtils;
 import br.com.spedison.digestor_csv.infra.Utils;
 import br.com.spedison.digestor_csv.model.ConfiguracaoVO;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -40,7 +42,7 @@ public abstract class ProcessadorBase {
     private Long idTarefa;
 
     @Getter
-    private FileProcessamento[] arquivosEmProcessamento;
+    private ListFileProcessamento arquivosEmProcessamento = new ListFileProcessamento();
 
     @Getter
     Charset encoding;
@@ -51,18 +53,18 @@ public abstract class ProcessadorBase {
     @Getter
     private JobContext jobContext;
 
-    protected FileProcessamento[] listaArquivosParaProcessar() {
+    protected void listaArquivosParaProcessar(ListFileProcessamento listaParaAdd) {
         File dirParaListar = new File(getDiretorioEntrada());
-        return Arrays.stream(
-                        dirParaListar.listFiles(
+        Arrays.stream(
+                        Objects.requireNonNull(dirParaListar.listFiles(
                                 (dir, name) -> {
                                     String ext = getExtensao().toLowerCase();
                                     if (ext.equals("*")) return true;
                                     return name.toLowerCase().endsWith("." + ext);
-                                })
+                                }))
                 )
                 .map(f -> new FileProcessamento(f.getAbsolutePath()))
-                .toArray(FileProcessamento[]::new);
+                .forEach(listaParaAdd::add);
     }
 
     // Essa deve ser a última instrução antes de terminar o processamento;
@@ -78,14 +80,14 @@ public abstract class ProcessadorBase {
 
     abstract String getDiretorioEntrada();
 
-    @CacheEvict({"primeiro-entrada-entrada","diretorios-entrada",   })
+    @CacheEvict({"primeiro-entrada-entrada", "diretorios-entrada",})
     public void executar(Long idTarefa, JobContext jobContext) {
-        preInicia(idTarefa,jobContext);
+        preInicia(idTarefa, jobContext);
         this.idTarefa = idTarefa;
         this.jobId = jobContext.getJobId();
         this.jobContext = jobContext;
         properties = configuracaoService.getConfiguracao();
-        arquivosEmProcessamento = listaArquivosParaProcessar();
+        listaArquivosParaProcessar(arquivosEmProcessamento);
         encoding = configuracaoService.getEnconding();
         if (iniciar()) {
             new File(getDiretorioSaida()).mkdirs(); // Cria diretório de saida.
@@ -138,13 +140,13 @@ public abstract class ProcessadorBase {
     }
 
     public Long getLinhasProcessadas() {
-        if (getArquivosEmProcessamento() == null)
+        if (getArquivosEmProcessamento() == null || getArquivosEmProcessamento().isEmpty())
             return 0L;
 
-        return Arrays
-                .stream(getArquivosEmProcessamento())
-                .map(FileProcessamento::getNumeroLinhasProcessadas)
-                .reduce(0L, (a, b) -> a + b);
+        return
+                getArquivosEmProcessamento()
+                        .stream()
+                        .map(FileProcessamento::getNumeroLinhasProcessadas)
+                        .reduce(0L, (a, b) -> a + b);
     }
-
 }

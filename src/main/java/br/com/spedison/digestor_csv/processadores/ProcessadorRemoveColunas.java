@@ -105,7 +105,7 @@ public class ProcessadorRemoveColunas extends ProcessadorBase {
     @Override
     void processar() {
 
-        Stream<FileProcessamento> stream = Arrays.stream(super.getArquivosEmProcessamento());
+        Stream<FileProcessamento> stream = getArquivosEmProcessamento().stream();
 
         removeColunasService.registrarProcessando(getIdTarefa());
 

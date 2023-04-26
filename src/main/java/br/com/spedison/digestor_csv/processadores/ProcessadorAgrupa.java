@@ -149,14 +149,6 @@ public class ProcessadorAgrupa extends ProcessadorBase {
         colunasParaProcessar =
                 agrupaService.pegaCamposParaAgrupar(agrupaVO.getId());
 
-        // Numera todos os arquivos que serão processados.
-        IntStream
-                .range(0, getArquivosEmProcessamento().length)
-                .peek(i -> this.adicionaMap())// Adiciona item no map.
-                .forEach(
-                        i -> getArquivosEmProcessamento()[i]
-                                .setNumeroArquivoProcessamento(i)); // Defini o map na estrutura para processar.
-
         agrupaService.registrarInicioProcessamento(getIdTarefa(), getJobId().toString());
 
         return true;
@@ -165,7 +157,7 @@ public class ProcessadorAgrupa extends ProcessadorBase {
     @Override
     void processar() {
 
-        Stream<FileProcessamento> stream = Arrays.stream(getArquivosEmProcessamento());
+        Stream<FileProcessamento> stream = getArquivosEmProcessamento().stream();
 
         agrupaService.registrarProcessando(getIdTarefa());
 

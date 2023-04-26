@@ -52,9 +52,7 @@
                         </div>
                     </td>
                     <td>
-                        <div th:if="${!resumo.estado.toString().equals('PROCESSANDO')}">
-                            <a th:replace="icons :: copiar(@{/resumo/{id}/copiar(id=${resumo.id})})"/>
-                        </div>
+                        <a th:replace="icons :: copiar(@{/resumo/{id}/copiar(id=${resumo.id})})"/>
                     </td>
                     <td>
                         <div th:if="${resumo.estado.toString().equals('NAO_INICIADO')}">

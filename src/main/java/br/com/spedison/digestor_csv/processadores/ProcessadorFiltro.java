@@ -141,7 +141,7 @@ public class ProcessadorFiltro extends ProcessadorBase {
         // -- arquivosEmProcessamento = listaArquivosParaProcessar();
         logEstado("Iniciando processamento dos arquivos");
         filtroService.registrarProcessando(getIdTarefa());
-        Stream<FileProcessamento> sf = Arrays.stream(getArquivosEmProcessamento());
+        Stream<FileProcessamento> sf = getArquivosEmProcessamento().stream();
         if (isParalelo()) {
             sf = sf.parallel();
         }
