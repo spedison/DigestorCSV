@@ -4,7 +4,6 @@ package br.com.spedison.digestor_csv.processadores;
 import br.com.spedison.digestor_csv.infra.FileProcessamento;
 import br.com.spedison.digestor_csv.infra.ListFileProcessamento;
 import br.com.spedison.digestor_csv.infra.StringUtils;
-import br.com.spedison.digestor_csv.infra.Utils;
 import br.com.spedison.digestor_csv.model.ConfiguracaoVO;
 import br.com.spedison.digestor_csv.model.EstadoProcessamentoEnum;
 import br.com.spedison.digestor_csv.service.ConfiguracaoService;
@@ -42,7 +41,7 @@ public abstract class ProcessadorBase {
     private Long idTarefa;
 
     @Getter
-    private ListFileProcessamento arquivosEmProcessamento = new ListFileProcessamento();
+    private final ListFileProcessamento arquivosEmProcessamento = new ListFileProcessamento();
 
     @Getter
     Charset encoding;
@@ -63,7 +62,8 @@ public abstract class ProcessadorBase {
                                     return name.toLowerCase().endsWith("." + ext);
                                 }))
                 )
-                .map(f -> new FileProcessamento(f.getAbsolutePath()))
+                .map(File::getAbsolutePath)
+                .map(FileProcessamento::new)
                 .forEach(listaParaAdd::add);
     }
 

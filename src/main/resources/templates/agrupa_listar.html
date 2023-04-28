@@ -49,7 +49,7 @@
                         </div>
                     </td>
                     <td>
-                        <div th:if="${!agrupaVO.estado.toString().equals('PROCESSANDO')}">
+                        <div>
                             <a th:replace="icons :: copiar(@{/agrupa/{id}/copiar(id=${agrupaVO.id})})"/>
                         </div>
                     </td>

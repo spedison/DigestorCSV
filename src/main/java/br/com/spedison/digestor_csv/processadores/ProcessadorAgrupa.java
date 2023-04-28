@@ -157,6 +157,10 @@ public class ProcessadorAgrupa extends ProcessadorBase {
     @Override
     void processar() {
 
+        // Esse processamento é específico dessa atividade,
+        // pois ele tem uma lista de Maps apontando para arquivos de saída
+        getArquivosEmProcessamento().forEach(v->adicionaMap());
+
         Stream<FileProcessamento> stream = getArquivosEmProcessamento().stream();
 
         agrupaService.registrarProcessando(getIdTarefa());
